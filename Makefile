@@ -27,6 +27,8 @@ TEST_CPPFLAGS		= $(CPPFLAGS) -fno-inline
 TEST_LDFLAGS		= $(LDFLAGS) -lgtest -lgtest_main -lpthread
 
 # Define the object files
+SVG_OBJ				= $(OBJ_DIR)/svg.o
+
 TEST_SVG_OBJ		= $(TESTOBJ_DIR)/svg.o
 TEST_SVG_TEST_OBJ	= $(TESTOBJ_DIR)/SVGTest.o
 TEST_OBJ_FILES		= $(TEST_SVG_OBJ) $(TEST_SVG_TEST_OBJ)
@@ -37,20 +39,37 @@ TEST_STRSINK_OBJ_FILES	= $(TEST_STRSINK_OBJ) $(TEST_STRSINK_TEST_OBJ)
 
 TEST_STRSRC_OBJ			= $(TESTOBJ_DIR)/StringDataSource.o
 TEST_STRSRC_TEST_OBJ 	= $(TESTOBJ_DIR)/StringDataSourceTest.o
+TEST_STRSRC_OBJ_FILES	= $(TEST_STRSRC_OBJ) $(TEST_STRSRC_TEST_OBJ)
 
+TEST_SVGWRITER_OBJ		= $(TESTOBJ_DIR)/SVGWriter.o
+TEST_SVGWRITER_TEST_OBJ	= $(TESTOBJ_DIR)/SVGWriterTest.o
+TEST_SVGWRITER_OBJ_FILES= $(TEST_SVGWRITER_OBJ) $(TEST_SVGWRITER_TEST_OBJ) $(TEST_STRSINK_OBJ) $(SVGLIB_TARGET)
 
 # Define the targets
+SVGLIB_TARGET			= $(LIB_DIR)/libsvg.a
+
 TEST_SVG_TARGET			= $(TESTBIN_DIR)/testsvg
-TEST_STRSINK_TARGET 	= $(TESTBIN_DIR)/testteststrdatasink
+TEST_STRSINK_TARGET 	= $(TESTBIN_DIR)/teststrdatasink
+TEST_STRSRC_TARGET 		= $(TESTBIN_DIR)/teststrdatasource
+TEST_SVGWRITER_TARGET   = $(TESTBIN_DIR)/testsvgwriter
 
 
-all: directories run_svgtest run_sinktest gen_html
+all: directories run_svgtest make_svglib run_sinktest run_sourcetest run_svgwritertest gen_html
 
 run_svgtest: $(TEST_SVG_TARGET)
 	$(TEST_SVG_TARGET)
 
+make_svglib: $(SVGLIB_TARGET)
+
 run_sinktest: $(TEST_STRSINK_TARGET)
 	$(TEST_STRSINK_TARGET)
+
+run_sourcetest: $(TEST_STRSRC_TARGET)
+	$(TEST_STRSRC_TARGET)
+
+run_svgwritertest: $(TEST_SVGWRITER_TARGET)
+	$(TEST_SVGWRITER_TARGET)
+
 
 gen_html:
 	lcov --capture --directory . --output-file $(TESTCOVER_DIR)/coverage.info --ignore-errors inconsistent,source
@@ -60,11 +79,24 @@ gen_html:
 $(TEST_SVG_TARGET): $(TEST_OBJ_FILES)
 	$(CXX) $(TEST_CFLAGS) $(TEST_CPPFLAGS) $(TEST_OBJ_FILES) $(TEST_LDFLAGS) -o $(TEST_SVG_TARGET)
 
+$(SVGLIB_TARGET): $(SVG_OBJ)
+	$(AR) $(ARFLAGS) $(SVGLIB_TARGET) $(SVG_OBJ)
+
 $(TEST_STRSINK_TARGET): $(TEST_STRSINK_OBJ_FILES)
 	$(CXX) $(TEST_CFLAGS) $(TEST_CPPFLAGS) $(TEST_STRSINK_OBJ_FILES) $(TEST_LDFLAGS) -o $(TEST_STRSINK_TARGET)
 
+$(TEST_STRSRC_TARGET): $(TEST_STRSRC_OBJ_FILES)
+	$(CXX) $(TEST_CFLAGS) $(TEST_CPPFLAGS) $(TEST_STRSRC_OBJ_FILES) $(TEST_LDFLAGS) -o $(TEST_STRSRC_TARGET)
+
+$(TEST_SVGWRITER_TARGET): $(TEST_SVGWRITER_OBJ_FILES)
+	$(CXX) $(TEST_CFLAGS) $(TEST_CPPFLAGS) $(TEST_SVGWRITER_OBJ_FILES) $(TEST_LDFLAGS) -o $(TEST_SVGWRITER_TARGET)
+
+
 $(TEST_SVG_OBJ): $(SRC_DIR)/svg.c
 	$(CC) $(TEST_CFLAGS) $(DEFINES) $(INCLUDE) -c $(SRC_DIR)/svg.c -o $(TEST_SVG_OBJ)
+
+$(SVG_OBJ): $(SRC_DIR)/svg.c
+	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDE) -c $(SRC_DIR)/svg.c -o $(SVG_OBJ)
 
 $(TEST_SVG_TEST_OBJ): $(TESTSRC_DIR)/SVGTest.cpp
 	$(CXX) $(TEST_CFLAGS) $(TEST_CPPFLAGS) $(DEFINES) $(INCLUDE) -c $(TESTSRC_DIR)/SVGTest.cpp -o $(TEST_SVG_TEST_OBJ)
