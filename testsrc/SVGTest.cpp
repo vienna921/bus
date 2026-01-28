@@ -62,17 +62,25 @@ class SVGTest : public ::testing::Test{
 
 // --- BASIC CREATION TEST ---
 TEST_F(SVGTest, CreateAndDestroy){
+    //ASSERT_NE(DContext, nullptr);
+    //std::string output = DOutput.JoinOutput();
+    //EXPECT_NE(output.find("<?xml"), std::string::npos);
+    //EXPECT_NE(output.find("<svg"), std::string::npos);
 
+    //svg_return_t des = destroy(DContext);
+    //EXPECT_EQ(des, SVG_OK);
 }
 
 // --- INVALID INPUT TESTS ---
 TEST_F(SVGTest, NullContextFunctions){
-
+    //EXPECT_EQ(svg_circle(nullptr, nullptr, 0, nullptr), SVG_ERR_NULL);
+    //EXPECT_EQ(svg_rect(nullptr, nullptr, nullptr, nullptr), SVG_ERR_NULL);
+    //EXPECT_EQ(svg_line(nullptr, nullptr, nullptr, nullptr), SVG_ERR_NULL);
 }
 
 // --- DRAWING TESTS ---
 TEST_F(SVGTest, Circle){
-
+    //svg_point_t center = {};
 }
 
 TEST_F(SVGTest, Rectangle){

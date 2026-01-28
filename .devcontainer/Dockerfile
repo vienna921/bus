@@ -1,18 +1,33 @@
-FROM mcr.microsoft.com/devcontainers/cpp:1-debian12
+FROM python:3.14
 
-ARG REINSTALL_CMAKE_VERSION_FROM_SOURCE="none"
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Optionally install the cmake for vcpkg
-COPY ./reinstall-cmake.sh /tmp/
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    locales \
+    build-essential \
+    lcov \
+    gcovr \
+    pkg-config \
+    libgtest-dev \
+    libgmock-dev \
+    libexpat-dev \
+    libcsv-dev \
+    gdb \
+    git \
+    xmldiff \
+    less \
+    vim \
+    sudo  && \
+    echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+    locale-gen && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/\* /tmp/\* /var/tmp/* && \
+    useradd -m docker 
 
-RUN if [ "${REINSTALL_CMAKE_VERSION_FROM_SOURCE}" != "none" ]; then \
-        chmod +x /tmp/reinstall-cmake.sh && /tmp/reinstall-cmake.sh ${REINSTALL_CMAKE_VERSION_FROM_SOURCE}; \
-    fi \
-    && rm -f /tmp/reinstall-cmake.sh
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
 
-# [Optional] Uncomment this section to install additional vcpkg ports.
-# RUN su vscode -c "${VCPKG_ROOT}/vcpkg install <your-port-name-here>"
+WORKDIR /workspace
 
-# [Optional] Uncomment this section to install additional packages.
-# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-#     && apt-get -y install --no-install-recommends <your-package-list-here>
+SHELL ["/bin/bash", "-c"]
