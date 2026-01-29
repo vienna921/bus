@@ -37,21 +37,33 @@ bool CXMLReader::End() const{
 }
 
 bool CXMLReader::ReadEntity(SXMLEntity &entity, bool skipcdata){
-    while(DImplementation->DEntityQueue.empty()){
-        if(!DParserInitialized || !DSource){
-            return false;
-        }
-        
+    if(!DParserInitialized || !DSource){
+        return false;
+    }
+    while(DImplementation->DEntityQueue.empty()){ 
         std::vector<char> buffer(512);
-        int bytesRead = DSource->Read(buffer, sizeof(buffer));
-        if(bytesRead<0){
-            return false;
+        bool read = DSource->Read(buffer, buffer.size());
+        size_t bytesRead = buffer.size();
+
+        if(!read){
+            bytesRead = 0;
         }
-        bool isFinal = bytesRead == 0;
-        if(XML_Parse(DParser, buffer.data(), bytesRead, isFinal)==XML_STATUS_ERROR){
-            return false;
+        else{
+            bytesRead = buffer.size() < buffer.capacity() ? buffer.size() : buffer.capacity();
         }
-        if(isFinal && DImplementation->DEntityQueue.empty()){
+
+        if(bytesRead > 0){
+            if(XML_Parse(DParser, buffer.data(), static_cast<int>(bytesRead), 0) ==XML_STATUS_ERROR){
+                return false;
+            }
+        }
+        if(DSource->End()){
+            if(XML_Parse(DParser, nullptr, 0, 1) == XML_STATUS_ERROR){
+                return false;
+            }
+        }
+      
+        if(bytesRead == 0 && DImplementation->DEntityQueue.empty()){
             return false;
         }
     }
@@ -64,7 +76,7 @@ bool CXMLReader::ReadEntity(SXMLEntity &entity, bool skipcdata){
     }
 
     return true;
-}
+} 
 
 
 void CXMLReader::StartElement(void *userData, const XML_Char *name, const XML_Char **atts){
@@ -108,10 +120,9 @@ void CXMLReader::CharData(void *userData, const XML_Char *s, int len){
     auto reader = static_cast<CXMLReader *>(userData);
 
     if(len <= 0) return;
-    std::string text(s, len);
 
     if(!reader->DImplementation->DEntityQueue.empty()&&reader->DImplementation->DEntityQueue.back().DType == SXMLEntity::EType::CharData){
-        reader->DImplementation->DEntityQueue.back().DNameData += text;
+        reader->DImplementation->DEntityQueue.back().DNameData.append(s, len);
     }
     else{
         SXMLEntity entity;
