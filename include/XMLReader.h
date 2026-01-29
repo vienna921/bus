@@ -4,11 +4,18 @@
 #include <memory>
 #include "XMLEntity.h"
 #include "DataSource.h"
+#include "expat.h"
 
 class CXMLReader{
     private:
         struct SImplementation;
         std::unique_ptr<SImplementation> DImplementation;
+
+        std::shared_ptr<CDataSource> DSource;
+
+        XML_Parser DParser;
+        bool DParserInitialized;
+
         
     public:
         CXMLReader(std::shared_ptr< CDataSource > src);
