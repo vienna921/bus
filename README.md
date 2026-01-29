@@ -10,7 +10,7 @@ ECS 36B WQ 25 Project 2-4
 Student 1: Vienna Tan (925205757)
 Student 2: Sophia Chan ()
 ## Generative AI Use
-Student 1 used ChatGPT for Prompt 1, 2
+Student 1 used ChatGPT for Prompt 1, 2, 3
 
 ### Prompt 1
 what is the basic format for writing xml tests
@@ -222,7 +222,146 @@ Config c;
 ### Changes 2
 XMLReader.h and XMLReader.cpp structs understanding and implementation
 
+### Prompt 3
+how do I commit to main but im sharing git with my partner
+### Response 3
+Totally normal situation — this is exactly what Git is designed for. You can commit to main while sharing a repo, you just need to be disciplined about when and how.
 
+Here’s the clean, low-stress way to do it 👇
+
+The safest workflow (recommended)
+1. Always pull first
+
+Make sure you’re up to date before touching main.
+
+git checkout main
+git pull
+
+
+If this pulls changes from your partner → good, you’re synced.
+
+2. Make your changes
+
+Edit code as usual.
+
+Check what you changed:
+
+git status
+git diff
+
+3. Commit locally (this does NOT affect your partner yet)
+git add .
+git commit -m "Describe what you changed"
+
+
+At this point:
+
+✅ your work is saved
+
+❌ your partner hasn’t seen anything yet
+
+4. Push to shared main
+git push origin main
+
+
+Now your partner can pull your changes.
+
+What your partner should do
+
+They should run:
+
+git pull
+
+
+That’s it — Git merges automatically if there’s no conflict.
+
+🚨 Very important rules when sharing main
+Rule 1: Never force push
+ ❌ DO NOT DO THIS
+git push --force
+
+
+This can erase your partner’s work.
+
+Rule 2: Communicate before big changes
+
+If you’re about to:
+
+rename files
+
+change function signatures
+
+restructure directories
+
+Tell your partner first.
+
+If you and your partner edit the SAME file
+
+This can cause conflicts.
+
+What happens:
+
+Git stops the merge
+
+Marks conflict sections in the file
+
+Example:
+
+your code
+partner's code
+
+
+Fix it manually → then:
+
+git add conflicted_file.cpp
+git commit
+
+Even safer (best practice, if allowed)
+
+Use feature branches, then merge into main.
+
+git checkout -b xml-parser
+ work
+git add .
+git commit -m "Add XML test reader"
+git checkout main
+git pull
+git merge xml-parser
+git push
+
+
+This avoids stepping on each other.
+
+TL;DR (safe checklist)
+
+Before committing to main:
+
+git checkout main
+git pull
+
+
+After committing:
+
+git push
+
+
+Never:
+
+force push
+
+push without pulling first
+
+If you want, tell me:
+
+are you both pushing directly to main?
+
+GitHub, GitLab, or local shared repo?
+
+class project or personal?
+
+I’ll tailor a “zero-conflict” workflow for your setup.
+### Changes 3
+Learned how to use git with partners
 
 
 

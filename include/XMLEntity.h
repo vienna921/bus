@@ -13,7 +13,7 @@ struct SXMLEntity{
     EType DType;
     std::string DNameData;
     TAttributes DAttributes;
-    
+    // returns true if the attribute name is in the DAttributes
     bool AttributeExists(const std::string &name) const{
         for(auto &Attribute : DAttributes){
             if(std::get<0>(Attribute) == name){
@@ -22,7 +22,7 @@ struct SXMLEntity{
         }
         return false;
     };
-    
+    // returns the value of the attribute, or empty string if doesn't exist
     std::string AttributeValue(const std::string &name) const{
         for(auto &Attribute : DAttributes){
             if(std::get<0>(Attribute) == name){
@@ -31,7 +31,7 @@ struct SXMLEntity{
         }
         return std::string();
     };
-    
+    // Sets the attribute name to the value
     bool SetAttribute(const std::string &name, const std::string &value){
         if(name.empty()){
             return false;   
