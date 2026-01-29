@@ -76,7 +76,7 @@ bool CSVGWriter::SimplePath(const std::vector<SSVGPoint> points, const TAttribut
     }
     svgtext += "/>\n";
     std::vector<char> buffer(svgtext.begin(), svgtext.end());
-    return DImplementation->Sink->Write(buffer);; 
+    return DImplementation->Sink->Write(buffer);
 
 }
 

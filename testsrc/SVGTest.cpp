@@ -62,13 +62,6 @@ class SVGTest : public ::testing::Test{
 
 // --- BASIC CREATION TEST ---
 TEST_F(SVGTest, CreateAndDestroy){
-    //ASSERT_NE(DContext, nullptr);
-    //std::string output = DOutput.JoinOutput();
-    //EXPECT_NE(output.find("<?xml"), std::string::npos);
-    //EXPECT_NE(output.find("<svg"), std::string::npos);
-
-    //svg_return_t des = destroy(DContext);
-    //EXPECT_EQ(des, SVG_OK);
     EXPECT_FALSE(DOutput.DDestroyed);
     svg_return_t result = svg_destroy(DContext);
     EXPECT_EQ(result , SVG_OK);
@@ -78,13 +71,10 @@ TEST_F(SVGTest, CreateAndDestroy){
 
 // --- INVALID INPUT TESTS ---
 TEST_F(SVGTest, NullContextFunctions){
-    //EXPECT_EQ(svg_circle(nullptr, nullptr, 0, nullptr), SVG_ERR_NULL);
-    //EXPECT_EQ(svg_rect(nullptr, nullptr, nullptr, nullptr), SVG_ERR_NULL);
-    //EXPECT_EQ(svg_line(nullptr, nullptr, nullptr, nullptr), SVG_ERR_NULL);
     svg_point_t testPoint = {50, 50};
     svg_size_t testSize = {550, 324};
     const char* style = "stroke:black;fill:none";
-    EXPECT_EQ(svg_circle(nullptr, &testPoint, 10, style), SVG_ERR_NULL); // <-- ai assisted (see prompt 5)
+    EXPECT_EQ(svg_circle(nullptr, &testPoint, 10, style), SVG_ERR_NULL);
     EXPECT_EQ(svg_rect(nullptr, &testPoint, &testSize, style), SVG_ERR_NULL);
     EXPECT_EQ(svg_line(nullptr, &testPoint, &testPoint, style), SVG_ERR_NULL);
     EXPECT_EQ(svg_group_begin(nullptr, style), SVG_ERR_NULL);
@@ -101,9 +91,6 @@ TEST_F(SVGTest, Circle){
     svg_circle(DContext, &center, radius, style);
     std::string output = DOutput.JoinOutput();
     EXPECT_NE(output.find("<circle"), std::string::npos);
-
-    //std::string::npos means "not found" in a string
-    //JoinOutput() turns the output into a single line
 }
 
 TEST_F(SVGTest, Rectangle){
@@ -158,13 +145,12 @@ TEST_F(SVGTest, ZeroDimensions){
 
 TEST_F(SVGTest, NullPointPointer){
     // passing null pointer instead of pointer
-    // svg_point_t testPoint = {50, 50};
     svg_size_t testSize = {550, 324};
     svg_point_t start = {1, 5};
     svg_point_t end = {80, 65};
     const char* style = "stroke:black;fill:none";
     svg_return_t result1 = svg_circle(DContext, nullptr,  50, style);
-    EXPECT_EQ(result1, SVG_ERR_NULL); // <-- ai assisted (see prompt 5)
+    EXPECT_EQ(result1, SVG_ERR_NULL);
     svg_return_t result2 = svg_rect(DContext, nullptr, &testSize, style);
     EXPECT_EQ(result2, SVG_ERR_NULL);
     svg_return_t result3 = svg_line(DContext, nullptr, &end, style);
@@ -175,7 +161,7 @@ TEST_F(SVGTest, NullPointPointer){
 }
 
 TEST_F(SVGTest, CreateEdgeCases){
-    // testing weird inputs -- ai assisted (see prompt 5)
+    // testing weird inputs
     svg_context_ptr context1 = svg_create(write_callback, cleanup_callback, &DOutput,0 ,0);
     EXPECT_NE(context1, nullptr);
     svg_context_ptr context2 = svg_create(write_callback, cleanup_callback, &DOutput, 10000, 8000);
@@ -193,10 +179,8 @@ TEST_F(SVGTest, DestroyEdgeCases){
     svg_return_t result1 = svg_destroy(context);
     EXPECT_EQ(result1, SVG_OK);
     context = nullptr;
-    svg_return_t result2 = svg_destroy(context); //should fail
+    svg_return_t result2 = svg_destroy(context);
     EXPECT_EQ(result2, SVG_ERR_NULL);
-    // svg_return_t radius3 = svg_destroy(nullptr);
-    // EXPECT_EQ(radius3, SVG_ERR_NULL);
     
 }
 

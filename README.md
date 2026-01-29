@@ -6,9 +6,14 @@ ECS 36B WQ 25 Project 2-4
 ## Known Issues
 
 ## Code References
+* [std::to_string] https://en.cppreference.com/w/cpp/string/basic_string/to_string
+* [std::make_unique] https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique
+* [auto (C++)] https://learn.microsoft.com/en-us/cpp/cpp/auto-cpp?view=msvc-170
+
+
 
 Student 1: Vienna Tan (925205757)
-Student 2: Sophia Chan ()
+Student 2: Sophia Chan (925208411)
 ## Generative AI Use
 Student 1 used ChatGPT for Prompt 1, 2, 3
 
