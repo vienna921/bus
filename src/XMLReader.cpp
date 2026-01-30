@@ -60,7 +60,19 @@ bool CXMLReader::ReadEntity(SXMLEntity &entity, bool skipcdata){
             }
             return false;
         }
-        if(isFinal && DImplementation->DEntityQueue.empty()){
+
+        if(bytesRead > 0){
+            if(XML_Parse(DParser, buffer.data(), static_cast<int>(bytesRead), 0) ==XML_STATUS_ERROR){
+                return false;
+            }
+        }
+        if(DSource->End()){
+            if(XML_Parse(DParser, nullptr, 0, 1) == XML_STATUS_ERROR){
+                return false;
+            }
+        }
+      
+        if(bytesRead == 0 && DImplementation->DEntityQueue.empty()){
             return false;
         }
     }
@@ -80,7 +92,7 @@ bool CXMLReader::ReadEntity(SXMLEntity &entity, bool skipcdata){
     }
 
     return true;
-}
+} 
 
 
 void CXMLReader::StartElement(void *userData, const XML_Char *name, const XML_Char **atts){
@@ -124,10 +136,9 @@ void CXMLReader::CharData(void *userData, const XML_Char *s, int len){
     auto reader = static_cast<CXMLReader *>(userData);
 
     if(len <= 0) return;
-    std::string text(s, len);
 
     if(!reader->DImplementation->DEntityQueue.empty()&&reader->DImplementation->DEntityQueue.back().DType == SXMLEntity::EType::CharData){
-        reader->DImplementation->DEntityQueue.back().DNameData += text;
+        reader->DImplementation->DEntityQueue.back().DNameData.append(s, len);
     }
     else{
         SXMLEntity entity;
