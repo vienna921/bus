@@ -463,3 +463,71 @@ Just closes the group opened by GroupBegin()
 
 ### Changes 1
 I added comments of these examples for reference
+
+
+
+### Prompt 2
+am i supposed to write something in a destructor in c++
+
+### Response 2
+Short answer: sometimes — but often no.
+When you don’t need to write anything
+If your class does not manage resources manually, your destructor can be empty or omitted entirely.
+
+Examples:
+Only uses stack variables
+Uses STL containers (std::vector, std::string, std::map, etc.)
+Uses smart pointers (std::unique_ptr, std::shared_ptr)
+
+class Foo {
+    int x;
+    std::string s;
+}; // no destructor needed
+
+The compiler-generated destructor is sufficient.
+When you do need to write code in a destructor
+You need a destructor if your class owns resources that must be released:
+Memory allocated with new / new[]
+File handles (FILE*, streams)
+Mutexes / locks
+Network sockets
+Any resource acquired outside RAII containers
+
+class Bar {
+    int* data;
+public:
+    Bar() { data = new int[10]; }
+    ~Bar() { delete[] data; }
+};
+
+Very important rules
+Always match new with delete, new[] with delete[]
+If your class has a destructor and manages resources, you likely need:
+copy constructor
+copy assignment operator
+(Rule of Three / Five)
+Polymorphism rule (this is commonly tested)
+If a class is meant to be used polymorphically, the destructor must be virtual:
+
+class Base {
+public:
+    virtual ~Base() {}
+};
+
+Otherwise, deleting derived objects through a base pointer causes undefined behavior.
+Modern C++ best practice
+Prefer RAII and smart pointers so your destructor can stay empty:
+
+class Baz {
+    std::unique_ptr<int[]> data;
+}; // destructor auto-cleans
+
+TL;DR
+❌ No manual resources → no destructor needed
+✅ Owns resources → destructor frees them
+⚠️ Base class → make destructor virtual
+💡 Modern C++ → let RAII handle it
+If you want, you can paste your class and I’ll tell you exactly whether you need a destructor and what should go in it.
+
+### Changes 2
+no changes were made -- just clarification

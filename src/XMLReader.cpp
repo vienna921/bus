@@ -38,17 +38,26 @@ bool CXMLReader::End() const{
 
 bool CXMLReader::ReadEntity(SXMLEntity &entity, bool skipcdata){
     while(DImplementation->DEntityQueue.empty()){
-        if(!DParserInitialized || !DSource){
+        if(!DSource){
             return false;
         }
         
         std::vector<char> buffer(512);
-        int bytesRead = DSource->Read(buffer, sizeof(buffer));
-        if(bytesRead<0){
-            return false;
+        size_t bytesRead = 0;
+
+        char ch;
+        while (bytesRead < buffer.size() && DSource->Get(ch)){
+            buffer[bytesRead++] = ch;
         }
-        bool isFinal = bytesRead == 0;
-        if(XML_Parse(DParser, buffer.data(), bytesRead, isFinal)==XML_STATUS_ERROR){
+        // int bytesRead = DSource->Read(buffer, buffer.size());
+        // if(bytesRead<0){
+        //     return false;
+        // }
+        bool isFinal = (bytesRead == 0 || DSource->End());
+        if(XML_Parse(DParser, buffer.data(), static_cast<int>(bytesRead), isFinal)==XML_STATUS_ERROR){
+            if(!DImplementation->DEntityQueue.empty()){
+                break;
+            }
             return false;
         }
         if(isFinal && DImplementation->DEntityQueue.empty()){
@@ -59,6 +68,13 @@ bool CXMLReader::ReadEntity(SXMLEntity &entity, bool skipcdata){
     entity = DImplementation->DEntityQueue.front();
     DImplementation->DEntityQueue.pop();    
         
+    if(entity.DType == SXMLEntity::EType::CharData){
+        while(!DImplementation->DEntityQueue.empty() && DImplementation->DEntityQueue.front().DType == SXMLEntity::EType::CharData){
+            entity.DNameData += DImplementation->DEntityQueue.front().DNameData;
+            DImplementation->DEntityQueue.pop();
+        }
+    }
+
     if(skipcdata && entity.DType == SXMLEntity::EType::CharData){
         return ReadEntity(entity, skipcdata);
     }
