@@ -20,8 +20,8 @@ PKGS				= expat
 DEFINES				=
 INCLUDE				= -I $(INC_DIR) `pkg-config --cflags $(PKGS)`
 ARFLAGS				= rcs
-CLFAGS				= -Wall
-CPPFLAGS			= --std=c++17
+CFLAGS				= -Wall
+CPPFLAGS			= --std=c++20
 LDFLAGS				= `pkg-config --libs $(PKGS)`
 
 TEST_CFLAGS			= $(CFLAGS) -O0 -g --coverage
@@ -48,6 +48,8 @@ TEST_SVGWRITER_TEST_OBJ	= $(TESTOBJ_DIR)/SVGWriterTest.o
 TEST_SVGWRITER_OBJ_FILES= $(TEST_SVGWRITER_OBJ) $(TEST_SVGWRITER_TEST_OBJ) $(TEST_STRSINK_OBJ) $(SVGLIB_TARGET)
 
 TEST_XMLREADER_OBJ		= $(TESTOBJ_DIR)/XMLReader.o
+TEST_XML_TEST_OBJ		= $(TESTOBJ_DIR)/XMLReaderTest.o
+TEST_XML_OBJ_FILES		= $(TEST_STRSRC_OBJ) $(TEST_XMLREADER_OBJ) $(TEST_XML_TEST_OBJ)
 
 TEST_XMLBS_OBJ			= $(TESTOBJ_DIR)/XMLBusSystem.o
 TEST_XMLBS_TEST_OBJ		= $(TESTOBJ_DIR)/XMLBusSystemTest.o
@@ -64,18 +66,19 @@ TEST_SVG_TARGET			= $(TESTBIN_DIR)/testsvg
 TEST_STRSINK_TARGET 	= $(TESTBIN_DIR)/teststrdatasink
 TEST_STRSRC_TARGET 		= $(TESTBIN_DIR)/teststrdatasource
 TEST_SVGWRITER_TARGET   = $(TESTBIN_DIR)/testsvgwriter
+TEST_XML_TARGET			= $(TESTBIN_DIR)/testxml
 TEST_XMLBS_TARGET		= $(TESTBIN_DIR)/testxmlbs
 TEST_OSM_TARGET		= $(TESTBIN_DIR)/testosm
 
 
 all: 	directories 		\
-		run_svgtest 		\
 		make_svglib 		\
-		run_sinktest 		\
 		run_sourcetest 		\
+		run_sinktest 		\
 		run_svgwritertest 	\
-		run_osmtest			\
+		run_xmltest			\
 		run_xmlbstest 		\
+		run_osmtest			\
 		gen_html
 
 run_svgtest: $(TEST_SVG_TARGET)
@@ -94,6 +97,10 @@ run_sourcetest: $(TEST_STRSRC_TARGET)
 
 run_svgwritertest: $(TEST_SVGWRITER_TARGET)
 	$(TEST_SVGWRITER_TARGET) --gtest_output=xml:$(TESTTMP_DIR)/$@
+	mv $(TESTTMP_DIR)/$@ $@
+
+run_xmltest: $(TEST_XML_TARGET)
+	$(TEST_XML_TARGET) --gtest_output=xml:$(TESTTMP_DIR)/$@
 	mv $(TESTTMP_DIR)/$@ $@
 
 run_xmlbstest: $(TEST_XMLBS_TARGET)
@@ -123,6 +130,9 @@ $(TEST_STRSRC_TARGET): $(TEST_STRSRC_OBJ_FILES)
 
 $(TEST_SVGWRITER_TARGET): $(TEST_SVGWRITER_OBJ_FILES)
 	$(CXX) $(TEST_CFLAGS) $(TEST_CPPFLAGS) $(TEST_SVGWRITER_OBJ_FILES) $(TEST_LDFLAGS) -o $(TEST_SVGWRITER_TARGET)
+
+$(TEST_XML_TARGET): $(TEST_XML_OBJ_FILES)
+	$(CXX) $(TEST_CFLAGS) $(TEST_CPPFLAGS) $(TEST_XML_OBJ_FILES) $(TEST_LDFLAGS) -o $(TEST_XML_TARGET)
 
 $(TEST_XMLBS_TARGET): $(TEST_XMLBS_OBJ_FILES)
 	$(CXX) $(TEST_CFLAGS) $(TEST_CPPFLAGS) $(TEST_XMLBS_OBJ_FILES) $(TEST_LDFLAGS) -o $(TEST_XMLBS_TARGET)
