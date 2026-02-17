@@ -27,7 +27,7 @@ class CXMLReader{
         // is true only element type entities will be returned
         bool ReadEntity(SXMLEntity &entity, bool skipcdata = false);
 
-         static void StartElement(void *userData, const XML_Char *name, const XML_Char **atts);
+        static void StartElement(void *userData, const XML_Char *name, const XML_Char **atts);
         static void EndElement(void *userData, const XML_Char *name);
         static void CharData(void *userData, const XML_Char *s, int len);
 };

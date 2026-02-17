@@ -13,14 +13,16 @@ LIB_DIR				= ./lib
 TESTOBJ_DIR			= ./testobj
 TESTBIN_DIR			= ./testbin
 TESTCOVER_DIR		= ./htmlconv
+TESTTMP_DIR			= ./testtmp
 
 # Define the flags for compilation/linking
+PKGS				= expat
 DEFINES				=
-INCLUDE				= -I $(INC_DIR)
+INCLUDE				= -I $(INC_DIR) `pkg-config --cflags $(PKGS)`
 ARFLAGS				= rcs
-CFLAGS				= -Wall
-CPPFLAGS			= --std=c++20
-LDFLAGS				=
+CLFAGS				= -Wall
+CPPFLAGS			= --std=c++17
+LDFLAGS				= `pkg-config --libs $(PKGS)`
 
 TEST_CFLAGS			= $(CFLAGS) -O0 -g --coverage
 TEST_CPPFLAGS		= $(CPPFLAGS) -fno-inline
@@ -33,63 +35,78 @@ TEST_SVG_OBJ		= $(TESTOBJ_DIR)/svg.o
 TEST_SVG_TEST_OBJ	= $(TESTOBJ_DIR)/SVGTest.o
 TEST_OBJ_FILES		= $(TEST_SVG_OBJ) $(TEST_SVG_TEST_OBJ)
 
-TEST_STRSRC_OBJ			= $(TESTOBJ_DIR)/StringDataSource.o
-TEST_STRSRC_TEST_OBJ 	= $(TESTOBJ_DIR)/StringDataSourceTest.o
-TEST_STRSRC_OBJ_FILES	= $(TEST_STRSRC_OBJ) $(TEST_STRSRC_TEST_OBJ)
-
 TEST_STRSINK_OBJ		= $(TESTOBJ_DIR)/StringDataSink.o
 TEST_STRSINK_TEST_OBJ	= $(TESTOBJ_DIR)/StringDataSinkTest.o
 TEST_STRSINK_OBJ_FILES	= $(TEST_STRSINK_OBJ) $(TEST_STRSINK_TEST_OBJ)
 
-TEST_XML_OBJ	  		= $(TESTOBJ_DIR)/XMLReader.o
-TEST_XML_TEST_OBJ 		= $(TESTOBJ_DIR)/XMLTest.o
-TEST_XML_OBJ_FILES		= $(TEST_XML_OBJ) $(TEST_XML_TEST_OBJ) $(TEST_STRSRC_OBJ)
+TEST_STRSRC_OBJ			= $(TESTOBJ_DIR)/StringDataSource.o
+TEST_STRSRC_TEST_OBJ 	= $(TESTOBJ_DIR)/StringDataSourceTest.o
+TEST_STRSRC_OBJ_FILES	= $(TEST_STRSRC_OBJ) $(TEST_STRSRC_TEST_OBJ)
 
 TEST_SVGWRITER_OBJ		= $(TESTOBJ_DIR)/SVGWriter.o
 TEST_SVGWRITER_TEST_OBJ	= $(TESTOBJ_DIR)/SVGWriterTest.o
 TEST_SVGWRITER_OBJ_FILES= $(TEST_SVGWRITER_OBJ) $(TEST_SVGWRITER_TEST_OBJ) $(TEST_STRSINK_OBJ) $(SVGLIB_TARGET)
 
+TEST_XMLREADER_OBJ		= $(TESTOBJ_DIR)/XMLReader.o
+
+TEST_XMLBS_OBJ			= $(TESTOBJ_DIR)/XMLBusSystem.o
+TEST_XMLBS_TEST_OBJ		= $(TESTOBJ_DIR)/XMLBusSystemTest.o
+TEST_XMLBS_OBJ_FILES	= $(TEST_STRSRC_OBJ) $(TEST_XMLREADER_OBJ) $(TEST_XMLBS_OBJ) $(TEST_XMLBS_TEST_OBJ)
+
+TEST_OSM_OBJ			= $(TESTOBJ_DIR)/OpenStreetMap.o
+TEST_OSM_TEST_OBJ		= $(TESTOBJ_DIR)/OpenStreetMapTest.o
+TEST_OSM_OBJ_FILES		= $(TEST_STRSRC_OBJ) $(TEST_XMLREADER_OBJ) $(TEST_OSM_OBJ) $(TEST_OSM_TEST_OBJ)
+
 # Define the targets
 SVGLIB_TARGET			= $(LIB_DIR)/libsvg.a
 
 TEST_SVG_TARGET			= $(TESTBIN_DIR)/testsvg
-TEST_STRSRC_TARGET 		= $(TESTBIN_DIR)/teststrdatasource
 TEST_STRSINK_TARGET 	= $(TESTBIN_DIR)/teststrdatasink
-TEST_XML_TARGET			= $(TESTBIN_DIR)/testxml
+TEST_STRSRC_TARGET 		= $(TESTBIN_DIR)/teststrdatasource
 TEST_SVGWRITER_TARGET   = $(TESTBIN_DIR)/testsvgwriter
-MAIN_SRC 				= $(SRC_DIR)/main.c
-MAIN_TARGET 			= $(BIN_DIR)/main
-TARGET_SVG				= $(SRC_DIR)/target.svg
-OUTPUT_SVG				= output.svg
+TEST_XMLBS_TARGET		= $(TESTBIN_DIR)/testxmlbs
+TEST_OSM_TARGET		= $(TESTBIN_DIR)/testosm
 
-all: directories run_svgtest make_svglib run_sourcetest run_sinktest run_xmltest run_svgwritertest gen_html run_main compare_svg
+
+all: 	directories 		\
+		run_svgtest 		\
+		make_svglib 		\
+		run_sinktest 		\
+		run_sourcetest 		\
+		run_svgwritertest 	\
+		run_osmtest			\
+		run_xmlbstest 		\
+		gen_html
 
 run_svgtest: $(TEST_SVG_TARGET)
-	$(TEST_SVG_TARGET)
+	$(TEST_SVG_TARGET) --gtest_output=xml:$(TESTTMP_DIR)/$@
+	mv $(TESTTMP_DIR)/$@ $@
 
 make_svglib: $(SVGLIB_TARGET)
 
-run_sourcetest: $(TEST_STRSRC_TARGET)
-	$(TEST_STRSRC_TARGET)
-
 run_sinktest: $(TEST_STRSINK_TARGET)
-	$(TEST_STRSINK_TARGET)
+	$(TEST_STRSINK_TARGET) --gtest_output=xml:$(TESTTMP_DIR)/$@
+	mv $(TESTTMP_DIR)/$@ $@
 
-run_xmltest: $(TEST_XML_TARGET)
-	$(TEST_XML_TARGET)
+run_sourcetest: $(TEST_STRSRC_TARGET)
+	$(TEST_STRSRC_TARGET) --gtest_output=xml:$(TESTTMP_DIR)/$@
+	mv $(TESTTMP_DIR)/$@ $@
 
 run_svgwritertest: $(TEST_SVGWRITER_TARGET)
-	$(TEST_SVGWRITER_TARGET)
+	$(TEST_SVGWRITER_TARGET) --gtest_output=xml:$(TESTTMP_DIR)/$@
+	mv $(TESTTMP_DIR)/$@ $@
 
-run_main: $(MAIN_TARGET)
-	./$(MAIN_TARGET)
+run_xmlbstest: $(TEST_XMLBS_TARGET)
+	$(TEST_XMLBS_TARGET) --gtest_output=xml:$(TESTTMP_DIR)/$@
+	mv $(TESTTMP_DIR)/$@ $@
 
-compare_svg: run_main
-	@xmldiff $(OUTPUT_SVG) $(TARGET_SVG) && echo "SVGs identical" || echo "SVGs differ"
+run_osmtest: $(TEST_OSM_TARGET)
+	$(TEST_OSM_TARGET) --gtest_output=xml:$(TESTTMP_DIR)/$@
+	mv $(TESTTMP_DIR)/$@ $@
 
 gen_html:
 	lcov --capture --directory . --output-file $(TESTCOVER_DIR)/coverage.info --ignore-errors inconsistent,source
-	lcov --remove $(TESTCOVER_DIR)/coverage.info '/usr/*' '*/testsrc/*' --output-file $(TESTCOVER_DIR)/coverage.info
+	lcov --remove $(TESTCOVER_DIR)/coverage.info '*.h' '/usr/*' '*/testsrc/*' --output-file $(TESTCOVER_DIR)/coverage.info
 	genhtml $(TESTCOVER_DIR)/coverage.info --output-directory $(TESTCOVER_DIR)
 
 $(TEST_SVG_TARGET): $(TEST_OBJ_FILES)
@@ -98,17 +115,20 @@ $(TEST_SVG_TARGET): $(TEST_OBJ_FILES)
 $(SVGLIB_TARGET): $(SVG_OBJ)
 	$(AR) $(ARFLAGS) $(SVGLIB_TARGET) $(SVG_OBJ)
 
-$(TEST_STRSRC_TARGET): $(TEST_STRSRC_OBJ_FILES)
-	$(CXX) $(TEST_CFLAGS) $(TEST_CPPFLAGS) $(TEST_STRSRC_OBJ_FILES) $(TEST_LDFLAGS) -o $(TEST_STRSRC_TARGET)
-
 $(TEST_STRSINK_TARGET): $(TEST_STRSINK_OBJ_FILES)
 	$(CXX) $(TEST_CFLAGS) $(TEST_CPPFLAGS) $(TEST_STRSINK_OBJ_FILES) $(TEST_LDFLAGS) -o $(TEST_STRSINK_TARGET)
 
-$(TEST_XML_TARGET): $(TEST_XML_OBJ_FILES)
-	$(CXX) $(TEST_CFLAGS) $(TEST_CPPFLAGS) $(TEST_XML_OBJ_FILES) $(TEST_LDFLAGS) -lexpat -o $(TEST_XML_TARGET)
+$(TEST_STRSRC_TARGET): $(TEST_STRSRC_OBJ_FILES)
+	$(CXX) $(TEST_CFLAGS) $(TEST_CPPFLAGS) $(TEST_STRSRC_OBJ_FILES) $(TEST_LDFLAGS) -o $(TEST_STRSRC_TARGET)
 
-$(TEST_SVGWRITER_TARGET): $(TEST_SVGWRITER_OBJ_FILES) $(SVGLIB_TARGET)
+$(TEST_SVGWRITER_TARGET): $(TEST_SVGWRITER_OBJ_FILES)
 	$(CXX) $(TEST_CFLAGS) $(TEST_CPPFLAGS) $(TEST_SVGWRITER_OBJ_FILES) $(TEST_LDFLAGS) -o $(TEST_SVGWRITER_TARGET)
+
+$(TEST_XMLBS_TARGET): $(TEST_XMLBS_OBJ_FILES)
+	$(CXX) $(TEST_CFLAGS) $(TEST_CPPFLAGS) $(TEST_XMLBS_OBJ_FILES) $(TEST_LDFLAGS) -o $(TEST_XMLBS_TARGET)
+
+$(TEST_OSM_TARGET): $(TEST_OSM_OBJ_FILES)
+	$(CXX) $(TEST_CFLAGS) $(TEST_CPPFLAGS) $(TEST_OSM_OBJ_FILES) $(TEST_LDFLAGS) -o $(TEST_OSM_TARGET)
 
 $(TEST_SVG_OBJ): $(SRC_DIR)/svg.c
 	$(CC) $(TEST_CFLAGS) $(DEFINES) $(INCLUDE) -c $(SRC_DIR)/svg.c -o $(TEST_SVG_OBJ)
@@ -124,9 +144,6 @@ $(TESTOBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 
 $(TESTOBJ_DIR)/%.o: $(TESTSRC_DIR)/%.cpp
 	$(CXX) $(TEST_CFLAGS) $(TEST_CPPFLAGS) $(DEFINES) $(INCLUDE) -c $< -o $@
-
-$(MAIN_TARGET): $(MAIN_SRC) $(SVGLIB_TARGET)
-	$(CC) $(CFLAGS) $(INCLUDE) $(MAIN_SRC) $(SVGLIB_TARGET) -o $(MAIN_TARGET)
 
 directories:
 	mkdir -p $(BIN_DIR)

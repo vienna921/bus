@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="7" failures="5" disabled="0" errors="0" time="0." timestamp="2026-02-17T03:05:07.385" name="AllTests">
+  <testsuite name="SVGWriterTest" tests="7" failures="5" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-02-17T03:05:07.385">
+    <testcase name="CreateDestroyTest" file="testsrc/SVGWriterTest.cpp" line="5" status="run" result="completed" time="0." timestamp="2026-02-17T03:05:07.385" classname="SVGWriterTest">
+      <failure message="testsrc/SVGWriterTest.cpp:10&#x0A;Expected equality of these values:&#x0A;  Sink-&gt;String()&#x0A;    Which is: &quot;&quot;&#x0A;  &quot;&lt;?xml version=\&quot;1.0\&quot; encoding=\&quot;UTF-8\&quot;?&gt;&lt;svg width=\&quot;100\&quot; height=\&quot;50\&quot; xmlns=\&quot;http://www.w3.org/2000/svg\&quot;&gt;&lt;/svg&gt;&quot;&#x0A;" type=""><![CDATA[testsrc/SVGWriterTest.cpp:10
+Expected equality of these values:
+  Sink->String()
+    Which is: ""
+  "<?xml version=\"1.0\" encoding=\"UTF-8\"?><svg width=\"100\" height=\"50\" xmlns=\"http://www.w3.org/2000/svg\"></svg>"
+]]></failure>
+    </testcase>
+    <testcase name="CircleTest" file="testsrc/SVGWriterTest.cpp" line="13" status="run" result="completed" time="0." timestamp="2026-02-17T03:05:07.385" classname="SVGWriterTest">
+      <failure message="testsrc/SVGWriterTest.cpp:20&#x0A;Expected equality of these values:&#x0A;  sink-&gt;String()&#x0A;    Which is: &quot;&lt;circle cx=\&quot;50.000000\&quot; cy=\&quot;50.000000\&quot; r=\&quot;10.000000\&quot; fill=\&quot;red\&quot; stroke=\&quot;black\&quot;/&gt;\n&quot;&#x0A;  expectedOutput&#x0A;    Which is: &quot;&lt;circle cx=\&quot;50\&quot; cy=\&quot;50\&quot; r=\&quot;10\&quot; fill=\&quot;red\&quot; stroke=\&quot;black\&quot;/&gt;\n&quot;&#x0A;" type=""><![CDATA[testsrc/SVGWriterTest.cpp:20
+Expected equality of these values:
+  sink->String()
+    Which is: "<circle cx=\"50.000000\" cy=\"50.000000\" r=\"10.000000\" fill=\"red\" stroke=\"black\"/>\n"
+  expectedOutput
+    Which is: "<circle cx=\"50\" cy=\"50\" r=\"10\" fill=\"red\" stroke=\"black\"/>\n"
+]]></failure>
+    </testcase>
+    <testcase name="RectangleTest" file="testsrc/SVGWriterTest.cpp" line="25" status="run" result="completed" time="0." timestamp="2026-02-17T03:05:07.385" classname="SVGWriterTest">
+      <failure message="testsrc/SVGWriterTest.cpp:33&#x0A;Expected equality of these values:&#x0A;  sink-&gt;String()&#x0A;    Which is: &quot;&lt;rect x=\&quot;10.000000\&quot; y =\&quot;20.000000\&quot; width=\&quot;50.000000\&quot; height=\&quot;30.000000\&quot; fill=\&quot;blue\&quot; stroke=\&quot;black\&quot;/&gt;\n&quot;&#x0A;  expectedOutput&#x0A;    Which is: &quot;&lt;rect x=\&quot;10\&quot; y=\&quot;20\&quot; width=\&quot;50\&quot; height=\&quot;30\&quot; fill=\&quot;blue\&quot; stroke=\&quot;black\&quot;/&gt;\n&quot;&#x0A;" type=""><![CDATA[testsrc/SVGWriterTest.cpp:33
+Expected equality of these values:
+  sink->String()
+    Which is: "<rect x=\"10.000000\" y =\"20.000000\" width=\"50.000000\" height=\"30.000000\" fill=\"blue\" stroke=\"black\"/>\n"
+  expectedOutput
+    Which is: "<rect x=\"10\" y=\"20\" width=\"50\" height=\"30\" fill=\"blue\" stroke=\"black\"/>\n"
+]]></failure>
+    </testcase>
+    <testcase name="LineTest" file="testsrc/SVGWriterTest.cpp" line="37" status="run" result="completed" time="0." timestamp="2026-02-17T03:05:07.385" classname="SVGWriterTest">
+      <failure message="testsrc/SVGWriterTest.cpp:44&#x0A;Expected equality of these values:&#x0A;  sink-&gt;String()&#x0A;    Which is: &quot;&lt;line x1=\&quot;0.000000\&quot; y1=\&quot;0.000000\&quot; x2=\&quot;100.000000\&quot; y2=\&quot;100.000000\&quot; stroke=\&quot;black\&quot; stroke-width=\&quot;2\&quot;/&gt;\n&quot;&#x0A;  expectedOutput&#x0A;    Which is: &quot;&lt;line x1=\&quot;0\&quot; y1=\&quot;0\&quot; x2=\&quot;100\&quot; y2=\&quot;100\&quot; stroke=\&quot;black\&quot; stroke-width=\&quot;2\&quot;/&gt;\n&quot;&#x0A;" type=""><![CDATA[testsrc/SVGWriterTest.cpp:44
+Expected equality of these values:
+  sink->String()
+    Which is: "<line x1=\"0.000000\" y1=\"0.000000\" x2=\"100.000000\" y2=\"100.000000\" stroke=\"black\" stroke-width=\"2\"/>\n"
+  expectedOutput
+    Which is: "<line x1=\"0\" y1=\"0\" x2=\"100\" y2=\"100\" stroke=\"black\" stroke-width=\"2\"/>\n"
+]]></failure>
+    </testcase>
+    <testcase name="SimplePathTest" file="testsrc/SVGWriterTest.cpp" line="47" status="run" result="completed" time="0." timestamp="2026-02-17T03:05:07.385" classname="SVGWriterTest">
+      <failure message="testsrc/SVGWriterTest.cpp:55&#x0A;Expected equality of these values:&#x0A;  sink-&gt;String()&#x0A;    Which is: &quot;&lt;path d=\&quot;M 10.000000 10.000000 L 20.000000 20.000000 L 30.000000 15.000000\&quot; stroke=\&quot;black\&quot; fill=\&quot;none\&quot;/&gt;\n&quot;&#x0A;  expectedOutput&#x0A;    Which is: &quot;&lt;path d=\&quot;M 10 10 L 20 20 L 30 15\&quot; stroke=\&quot;black\&quot; fill=\&quot;none\&quot;/&gt;\n&quot;&#x0A;" type=""><![CDATA[testsrc/SVGWriterTest.cpp:55
+Expected equality of these values:
+  sink->String()
+    Which is: "<path d=\"M 10.000000 10.000000 L 20.000000 20.000000 L 30.000000 15.000000\" stroke=\"black\" fill=\"none\"/>\n"
+  expectedOutput
+    Which is: "<path d=\"M 10 10 L 20 20 L 30 15\" stroke=\"black\" fill=\"none\"/>\n"
+]]></failure>
+    </testcase>
+    <testcase name="GroupTest" file="testsrc/SVGWriterTest.cpp" line="59" status="run" result="completed" time="0." timestamp="2026-02-17T03:05:07.385" classname="SVGWriterTest" />
+    <testcase name="ErrorTests" file="testsrc/SVGWriterTest.cpp" line="92" status="run" result="completed" time="0." timestamp="2026-02-17T03:05:07.385" classname="SVGWriterTest" />
+  </testsuite>
+</testsuites>
