@@ -162,6 +162,7 @@ directories:
 	mkdir -p $(TESTOBJ_DIR)
 	mkdir -p $(TESTBIN_DIR)
 	mkdir -p $(TESTCOVER_DIR)
+	mkdir -p $(TESTTMP_DIR)
 
 clean:
 	rm -rf $(BIN_DIR)
@@ -170,4 +171,5 @@ clean:
 	rm -rf $(TESTOBJ_DIR)
 	rm -rf $(TESTBIN_DIR)
 	rm -rf $(TESTCOVER_DIR)
+	rm -rf $(TESTTMP_DIR)
 

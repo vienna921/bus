@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<<<<<<< HEAD
 <testsuites tests="4" failures="0" disabled="0" errors="0" time="0." timestamp="2026-02-18T23:46:57.339" name="AllTests">
   <testsuite name="StringDataSource" tests="4" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-02-18T23:46:57.339">
     <testcase name="EndTest" file="testsrc/StringDataSourceTest.cpp" line="4" status="run" result="completed" time="0." timestamp="2026-02-18T23:46:57.339" classname="StringDataSource" />
     <testcase name="PeekTest" file="testsrc/StringDataSourceTest.cpp" line="12" status="run" result="completed" time="0." timestamp="2026-02-18T23:46:57.339" classname="StringDataSource" />
     <testcase name="GetTest" file="testsrc/StringDataSourceTest.cpp" line="32" status="run" result="completed" time="0." timestamp="2026-02-18T23:46:57.339" classname="StringDataSource" />
     <testcase name="ReadTest" file="testsrc/StringDataSourceTest.cpp" line="58" status="run" result="completed" time="0." timestamp="2026-02-18T23:46:57.339" classname="StringDataSource" />
+=======
+<testsuites tests="4" failures="0" disabled="0" errors="0" time="0." timestamp="2026-02-19T00:21:46.300" name="AllTests">
+  <testsuite name="StringDataSource" tests="4" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-02-19T00:21:46.301">
+    <testcase name="EndTest" file="testsrc/StringDataSourceTest.cpp" line="4" status="run" result="completed" time="0." timestamp="2026-02-19T00:21:46.301" classname="StringDataSource" />
+    <testcase name="PeekTest" file="testsrc/StringDataSourceTest.cpp" line="12" status="run" result="completed" time="0." timestamp="2026-02-19T00:21:46.301" classname="StringDataSource" />
+    <testcase name="GetTest" file="testsrc/StringDataSourceTest.cpp" line="32" status="run" result="completed" time="0." timestamp="2026-02-19T00:21:46.301" classname="StringDataSource" />
+    <testcase name="ReadTest" file="testsrc/StringDataSourceTest.cpp" line="58" status="run" result="completed" time="0." timestamp="2026-02-19T00:21:46.301" classname="StringDataSource" />
+>>>>>>> 3b9d75471752b513adc060ba801f82263cc8d070
   </testsuite>
 </testsuites>
