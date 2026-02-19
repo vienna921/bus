@@ -26,23 +26,26 @@ struct CXMLBusSystem::SImplementation{
             DDescription = description;
         }
         ~SStop(){};
+        // Bus System Stop member functions
+        // Returns the stop id of the stop
         TStopID ID() const noexcept override{
-            
+            return DID;
         }
-
+        // Returns the node id of the bus stop
         CStreetMap::TNodeID NodeID() const noexcept override{
-            
+            return DNodeID;  
         }
 
         std::string Description() const noexcept override{
-            
+            return DDescription;
         }
 
         std::string Description(const std::string &description) noexcept override{
-            
+            DDescription = description;
+            return DDescription;
         }
-    };
 
+    // 
     bool FindStartTag(std::shared_ptr< CXMLReader > xmlsource, const std::string &starttag){
         SXMLEntity TempEntity;
         while(xmlsource->ReadEntity(TempEntity,true)){
@@ -121,30 +124,37 @@ struct CXMLBusSystem::SImplementation{
         
     }
 
+    // returns the number of stops in the system
     std::size_t StopCount() const noexcept{
         return DStopsByIndex.size();
     }
 
+    // returns the number of routes in the system
     std::size_t RouteCount() const noexcept{
         return 0;
     }
     
+    // returns the SStop specified by the index, nullptr is returns if index is greater than equal to StopCount()
     std::shared_ptr<SStop> StopByIndex(std::size_t index) const noexcept{
         return DStopsByIndex[index];
     }
     
+    // returns the SStop specified by the stop id, nullptr is returned if id is not in the stops
     std::shared_ptr<SStop> StopByID(TStopID id) const noexcept{
         return nullptr;
     }
     
+    // returns the SRoute specified by the index, nullptr is returned if index is greater than equal to RouteCount()
     std::shared_ptr<SRoute> RouteByIndex(std::size_t index) const noexcept{
 
     }
     
+    //returns the SRoute specified by the name, nullptr is returned if name is not in the routes
     std::shared_ptr<SRoute> RouteByName(const std::string &name) const noexcept{
 
     }
     
+    // returns the SPath that connects the two stops, nullptr is returned if path doesn't exist
     std::shared_ptr<SPath> PathByStopIDs(TStopID start, TStopID end) const noexcept{
 
     }

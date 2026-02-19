@@ -15,7 +15,7 @@ ECS 36B WQ 25 Project 2-4
 Student 1: Vienna Tan (925205757)
 Student 2: Sophia Chan (925208411)
 ## Generative AI Use
-Student 1 used ChatGPT for Prompt 1, 2, 3
+Student 1 used ChatGPT for Prompt 1, 2, 3, 4, 5
 
 ### Prompt 1
 what is the basic format for writing xml tests
@@ -370,6 +370,219 @@ Learned how to use git with partners
 
 
 
+
+### Prompt 4
+what does #include <unordered_map> do and how to use it   
+### Response 4
+🔹 What does #include <unordered_map> do?
+
+It gives you access to the C++ container:
+
+std::unordered_map
+
+
+An unordered_map is a hash table.
+
+It stores:
+
+key → value
+
+
+Pairs.
+
+Think of it like:
+
+Python dictionary
+
+Java HashMap
+
+A lookup table
+
+🔹 What’s special about unordered_map?
+
+It allows very fast lookups:
+
+O(1) average time
+
+
+So instead of searching through a vector one-by-one:
+
+O(n)
+
+
+You can instantly find something by key.
+
+🔹 Basic Example
+#include <unordered_map>
+#include <string>
+#include <iostream>
+
+int main(){
+    std::unordered_map<std::string, int> ages;
+
+    ages["Alice"] = 20;
+    ages["Bob"] = 25;
+
+    std::cout << ages["Alice"] << std::endl;  // prints 20
+}
+
+
+Here:
+
+Key type = std::string
+
+Value type = int
+
+🔹 How It Works
+
+Declaration:
+
+std::unordered_map<KeyType, ValueType> name;
+
+
+Example:
+
+std::unordered_map<int, std::string> stops;
+
+🔹 Common Operations
+Insert
+map[key] = value;
+
+
+or
+
+map.insert({key, value});
+
+Access
+map[key]
+
+
+⚠️ Warning:
+If the key does NOT exist, map[key] creates it automatically.
+
+If you want safe lookup:
+
+map.at(key)
+
+
+This throws an exception if not found.
+
+Check if key exists
+if(map.find(key) != map.end()){
+    // key exists
+}
+
+Remove
+map.erase(key);
+
+Loop through it
+for(const auto &pair : map){
+    std::cout << pair.first << " -> " << pair.second << std::endl;
+}
+
+🔹 unordered_map vs map
+std::map	std::unordered_map
+Ordered (sorted keys)	Not ordered
+Slower (O(log n))	Faster (O(1) avg)
+Uses tree	Uses hash table
+### Changes 4
+XMLBusSystem understanding on how unordered maps work to be able to use it
+
+### Prompt 5
+What does const mean after a function
+### Response 5
+🔹 What does const mean after a function?
+
+When you write:
+
+int GetValue() const;
+
+
+The const at the end means:
+
+🔒 This function is not allowed to modify the object.
+
+It promises that the function will not change any member variables.
+
+🔹 Example
+class Person {
+private:
+    int age;
+
+public:
+    int GetAge() const {
+        return age;
+    }
+};
+
+
+Because GetAge() is marked const, it cannot change age.
+
+If you try:
+
+int GetAge() const {
+    age = 10;   // ❌ ERROR
+    return age;
+}
+
+
+The compiler will stop you.
+
+🔹 Why This Matters
+
+Suppose you have:
+
+const Person p;
+
+
+You can only call const functions on p.
+
+p.GetAge();   // ✅ OK
+p.SetAge(20); // ❌ ERROR if SetAge is not const
+
+
+So marking functions const allows them to work on const objects.
+
+🔹 What Exactly Is Protected?
+
+Inside a const function:
+
+❌ You cannot change member variables
+
+❌ You cannot call non-const member functions
+
+✅ You can read member variables
+
+✅ You can call other const functions
+
+🔹 How the Compiler Thinks About It
+
+This:
+
+int GetAge() const;
+
+
+Is basically treated like:
+
+int GetAge(const Person* this);
+
+
+Meaning the this pointer is const.
+
+So you can’t modify the object through it.
+
+🔹 Very Common in Getter Functions
+
+Most getters should be const:
+
+int Size() const;
+bool Empty() const;
+std::string Name() const;
+
+
+Because they don’t modify anything.
+### Changes 5
+Understanding how to use functions with const
 
 ## Generative AI Use
 Student 2 used ChatGPT for Prompt 1
