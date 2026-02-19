@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 
+
 struct CSVGWriter::SImplementation{
     std::shared_ptr<CDataSink> Sink;
     TSVGPixel Width;
@@ -16,6 +17,7 @@ CSVGWriter::CSVGWriter(std::shared_ptr< CDataSink > sink, TSVGPixel width, TSVGP
     DImplementation->Width = width;
     DImplementation->Height = height;
 
+
 }
 
 CSVGWriter::~CSVGWriter(){
@@ -24,7 +26,7 @@ CSVGWriter::~CSVGWriter(){
 
 bool CSVGWriter::Circle(const SSVGPoint &center, TSVGReal radius, const TAttributes &style){
     //example: <circle cx="50" cy="50" r="10" fill="red" />
-    std::string svgtext = "<circle cx=\"" + std::to_string(center.DX) + "\" cy=\"" + std::to_string(center.DY) + "\" r=\"" + std::to_string(radius) + "\"";
+    std::string svgtext = "<circle cx=\"" + std::to_string((int)center.DX) + "\" cy=\"" + std::to_string((int)center.DY) + "\" r=\"" + std::to_string((int)radius) + "\"";
     for (auto &attr : style){
         svgtext += " " + attr.first + "=\"" + attr.second+ "\"";
     }
@@ -37,7 +39,7 @@ bool CSVGWriter::Circle(const SSVGPoint &center, TSVGReal radius, const TAttribu
 
 bool CSVGWriter::Rectange(const SSVGPoint &topleft, const SSVGSize &size, const TAttributes &style){
     //example: <rect x="10" y="20" width="50" height="30" fill="blue" stroke="black"/>
-    std::string svgtext = "<rect x=\"" + std::to_string(topleft.DX) + "\" y =\"" + std::to_string(topleft.DY) + "\" width=\"" + std::to_string(size.DWidth) + "\" height=\"" + std::to_string(size.DHeight) + "\"";
+    std::string svgtext = "<rect x=\"" + std::to_string((int)topleft.DX) + "\" y=\"" + std::to_string((int)topleft.DY) + "\" width=\"" + std::to_string((int)size.DWidth) + "\" height=\"" + std::to_string((int)size.DHeight) + "\"";
     for (auto &attr : style){
         svgtext += " " + attr.first + "=\"" + attr.second + "\"";
     }
@@ -50,7 +52,7 @@ bool CSVGWriter::Rectange(const SSVGPoint &topleft, const SSVGSize &size, const 
 
 bool CSVGWriter::Line(const SSVGPoint &start, const SSVGPoint &end, const TAttributes &style){
     //example: <line x1="0" y1="0" x2="100" y2="100" stroke="black" stroke-width="2"/>
-    std::string svgtext = "<line x1=\"" + std::to_string(start.DX) + "\" y1=\"" + std::to_string(start.DY) +"\" x2=\"" + std::to_string(end.DX) + "\" y2=\"" + std::to_string(end.DY) + "\"";
+    std::string svgtext = "<line x1=\"" + std::to_string((int)start.DX) + "\" y1=\"" + std::to_string((int)start.DY) +"\" x2=\"" + std::to_string((int)end.DX) + "\" y2=\"" + std::to_string((int)end.DY) + "\"";
     for (auto &attr : style){
         svgtext += " " + attr.first + "=\"" + attr.second + "\"";
     }
@@ -65,9 +67,9 @@ bool CSVGWriter::SimplePath(const std::vector<SSVGPoint> points, const TAttribut
     if (points.empty()) return false;
     std::string svgtext = "<path d=\"";
     //first point -> M x y
-    svgtext += "M " + std::to_string(points[0].DX) + " " + std::to_string(points[0].DY);
+    svgtext += "M " + std::to_string((int)points[0].DX) + " " + std::to_string((int)points[0].DY);
     for (size_t i = 1; i < points.size(); i++){
-        svgtext += " L " + std::to_string(points[i].DX) + " " + std::to_string(points[i].DY);
+        svgtext += " L " + std::to_string((int)points[i].DX) + " " + std::to_string((int)points[i].DY);
     }
     svgtext += "\"";
     for (auto &attr : style){
