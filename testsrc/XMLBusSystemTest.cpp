@@ -89,10 +89,10 @@ TEST(XMLBusSystemTest, PathParsing){
     
     EXPECT_EQ(BusSystem.RouteCount(),0);
 
-    auto path - BusSystem.PathByStopIDs(321, 311);
+    auto path = BusSystem.PathByStopIDs(321, 311);
     ASSERT_NE(path, nullptr);
     EXPECT_EQ(path->StartNodeID(), 321);
-    EXPECT_EQ(path->EndNodeId(), 311);
+    EXPECT_EQ(path->EndNodeID(), 311);
     EXPECT_EQ(path->NodeCount(), 3);
     EXPECT_EQ(path->GetNodeID(0), 321);
     EXPECT_EQ(path->GetNodeID(1), 315);
@@ -116,7 +116,7 @@ TEST(XMLBusSystemTest, LookupFailure){
     EXPECT_EQ(BusSystem.StopByID(999), nullptr);
     EXPECT_EQ(BusSystem.StopByIndex(5), nullptr);
     EXPECT_EQ(BusSystem.RouteByIndex(10), nullptr);
-    EXPECT_EQ(BusSystem.RouteByName("nonexisting", nullptr));
+    EXPECT_EQ(BusSystem.RouteByName("nonexisting"), nullptr);
 }
 
 TEST(XMLBusSystemTest, EmptySystem){

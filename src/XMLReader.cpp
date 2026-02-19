@@ -3,103 +3,128 @@
 #include <queue>
 
 struct CXMLReader::SImplementation{
-    XML_Parser DParser;
-    std::queue< SXMLEntity > DQueue;
-    std::shared_ptr< CDataSource > DSource;
-
-    static void ExpatStartElement(void *data, const XML_Char *name, const XML_Char **attrs){
-        SImplementation *This = (SImplementation *)data;
-        SXMLEntity TempEntity;
-        TempEntity.DNameData = name;
-        TempEntity.DType = SXMLEntity::EType::StartElement;
-        for(int Index = 0; attrs[Index]; Index += 2){
-            TempEntity.DAttributes.push_back({attrs[Index],attrs[Index+1]});
-        }
-        This->DQueue.push(TempEntity);
-    }
-
-    static void ExpatEndElement(void *data, const XML_Char *name){
-        SImplementation *This = (SImplementation *)data;
-        SXMLEntity TempEntity;
-        TempEntity.DNameData = name;
-        TempEntity.DType = SXMLEntity::EType::EndElement;
-        This->DQueue.push(TempEntity);
-    }
-
-    static void ExpatCharacterData(void *data, const XML_Char *s, int len){
-        SImplementation *This = (SImplementation *)data;
-        // SXMLEntity TempEntity;
-        std::string Text(s, len);
-        if(!This->DQueue.empty()&&This->DQueue.back().DType == SXMLEntity::EType::CharData){
-            This->DQueue.back().DNameData += Text;
-        }
-        else{
-            SXMLEntity TempEntity;
-            TempEntity.DType = SXMLEntity::EType::CharData;
-            TempEntity.DNameData = Text;
-            This->DQueue.push(TempEntity);
-        }
-        
-        // TempEntity.DNameData = std::string(s,len);
-        // TempEntity.DType = SXMLEntity::EType::CharData;
-        // This->DQueue.push(TempEntity);
-    }
-
-    SImplementation(std::shared_ptr< CDataSource > src){
-        DSource = src;
-        DParser = XML_ParserCreate(nullptr);
-        XML_SetStartElementHandler(DParser,ExpatStartElement);
-        XML_SetEndElementHandler(DParser,ExpatEndElement);
-        XML_SetCharacterDataHandler(DParser,ExpatCharacterData);
-        XML_SetUserData(DParser,(void *)this);
-
-    }
-
-    ~SImplementation(){
-
-    }
-
-    bool End() const{
-        return DQueue.empty() && DSource->End();
-    }
-
-    bool ReadEntity(SXMLEntity &entity, bool skipcdata){
-        while(DQueue.empty()){
-            std::vector<char> Buffer(512);
-            if(DSource->Read(Buffer,Buffer.size())){
-                XML_Parse(DParser,Buffer.data(),Buffer.size(),DSource->End());
-            }
-            else{
-                return false;
-            }
-        }
-        while(skipcdata && !DQueue.empty() && DQueue.front().DType == SXMLEntity::EType::CharData){
-            DQueue.pop();
-        }
-        if(DQueue.empty()){
-            return false;
-        }
-        entity = DQueue.front();
-        DQueue.pop();
-        return true;
-        
-    }
-    
-
+    std::queue<SXMLEntity> DEntityQueue;
+    bool ParsingDone = false;
 };
 
-CXMLReader::CXMLReader(std::shared_ptr< CDataSource > src){
-    DImplementation = std::make_unique< SImplementation >(src);
+CXMLReader::CXMLReader(std::shared_ptr< CDataSource > src): DSource(src), DParserInitialized(false), DImplementation(std::make_unique<SImplementation>()){
+    DParser = XML_ParserCreate(nullptr);
+    if(DParser){
+        DParserInitialized = true;
+        XML_SetUserData(DParser, this);
+        XML_SetElementHandler(DParser, StartElement, EndElement);
+        XML_SetCharacterDataHandler(DParser, CharData);
+    }
 }
 
 CXMLReader::~CXMLReader(){
-
+    if(DParserInitialized){
+        XML_ParserFree(DParser);
+        DParser = nullptr;
+    }
 }
 
 bool CXMLReader::End() const{
-    return DImplementation->End();
+    if(!DImplementation->DEntityQueue.empty()){
+        return false;
+    }
+    if(DSource){
+        return DSource->End();
+    }
+    else{
+        return true;
+    }
 }
 
 bool CXMLReader::ReadEntity(SXMLEntity &entity, bool skipcdata){
-    return DImplementation->ReadEntity(entity,skipcdata);
+    while(DImplementation->DEntityQueue.empty()){
+        if(!DSource || DSource->End()){
+            return false;
+        }
+        
+        std::vector<char> buffer(512);
+        size_t bytesRead = 0;
+
+        char ch;
+        while (bytesRead < buffer.size() && DSource->Get(ch)){
+            buffer[bytesRead++] = ch;
+        }
+
+        bool isFinal = (bytesRead == 0 || DSource->End());
+        if(XML_Parse(DParser, buffer.data(), static_cast<int>(bytesRead), isFinal)==XML_STATUS_ERROR){
+            if(!DImplementation->DEntityQueue.empty()){
+                break;
+            }
+            return false;
+        }
+
+        if(bytesRead == 0 && DImplementation->DEntityQueue.empty()){
+            return false;
+        }
+    }
+
+    entity = DImplementation->DEntityQueue.front();
+    DImplementation->DEntityQueue.pop();    
+        
+
+    if(skipcdata && entity.DType == SXMLEntity::EType::CharData){
+        return ReadEntity(entity, skipcdata);
+    }
+
+    return true;
+} 
+
+
+void CXMLReader::StartElement(void *userData, const XML_Char *name, const XML_Char **atts){
+    auto reader = static_cast<CXMLReader *>(userData);
+
+    SXMLEntity entity;
+    entity.DType = SXMLEntity::EType::StartElement;
+    if(name){
+        entity.DNameData = name;
+    }
+    else{
+        entity.DNameData = "";
+    }
+
+
+    if(atts){
+        for(int i = 0; atts[i]; i+=2){
+        entity.SetAttribute(atts[i], atts[i+1]);
+    }
+    }
+
+    reader->DImplementation->DEntityQueue.push(entity);
+}
+
+void CXMLReader::EndElement(void *userData, const XML_Char *name){
+    auto reader = static_cast<CXMLReader *>(userData);
+
+    SXMLEntity entity;
+    entity.DType = SXMLEntity::EType::EndElement;
+    if(name){
+        entity.DNameData = name;
+    }
+    else{
+        entity.DNameData = "";
+    }
+
+    reader->DImplementation->DEntityQueue.push(entity);
+}
+
+void CXMLReader::CharData(void *userData, const XML_Char *s, int len){
+    if(len <= 0) return;
+    auto reader = static_cast<CXMLReader *>(userData);
+
+
+
+    if(!reader->DImplementation->DEntityQueue.empty()&&reader->DImplementation->DEntityQueue.back().DType == SXMLEntity::EType::CharData){
+        reader->DImplementation->DEntityQueue.back().DNameData.append(s, len);
+    }
+    else{
+        SXMLEntity entity;
+        entity.DType = SXMLEntity::EType::CharData;
+        entity.DNameData.assign(s, len);
+        reader->DImplementation->DEntityQueue.push(entity);
+    }
 }

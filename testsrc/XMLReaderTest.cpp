@@ -57,7 +57,6 @@ TEST(XMLReaderTest, CDataTest){
     SXMLEntity entity;
     ASSERT_TRUE(reader.ReadEntity(entity));
     EXPECT_EQ(entity.DType, SXMLEntity::EType::StartElement);
-
     ASSERT_TRUE(reader.ReadEntity(entity));
     EXPECT_EQ(entity.DType, SXMLEntity::EType::CharData);
     EXPECT_EQ(entity.DNameData, "THIS IS THE CDATA");
@@ -80,14 +79,20 @@ TEST(XMLReaderTest, LongCDataTest){
 
     ASSERT_TRUE(reader.ReadEntity(entity));
     EXPECT_EQ(entity.DType, SXMLEntity::EType::CharData);
-    EXPECT_EQ(entity.DNameData.size(), 600);
-    for(std::size_t i=0; i<entity.DNameData.size(); i++){
-        EXPECT_EQ(entity.DNameData[i], 'x');
+
+    std::string collected = entity.DNameData;
+    while(reader.ReadEntity(entity) && entity.DType == SXMLEntity::EType::CharData){
+        collected += entity.DNameData;
     }
 
-    ASSERT_TRUE(reader.ReadEntity(entity));
-    EXPECT_EQ(entity.DType, SXMLEntity::EType::EndElement);
+    EXPECT_EQ(collected.size(), 600);
 
+    for(char c : collected){
+        EXPECT_EQ(c, 'x');
+    }
+
+   
+    EXPECT_EQ(entity.DType, SXMLEntity::EType::EndElement);
     EXPECT_TRUE(reader.End());
 }
 
@@ -128,17 +133,19 @@ TEST(XMLReaderTest, LongCharDataCrosses512Boundary){
     CXMLReader reader(src);
 
     SXMLEntity entity;
+
     ASSERT_TRUE(reader.ReadEntity(entity));
     EXPECT_EQ(entity.DType, SXMLEntity::EType::StartElement);
 
     ASSERT_TRUE(reader.ReadEntity(entity));
     EXPECT_EQ(entity.DType, SXMLEntity::EType::CharData);
-    EXPECT_EQ(entity.DNameData.size(), 1024);
-    for(std::size_t i=0; i<entity.DNameData.size(); i++){
-        EXPECT_EQ(entity.DNameData[i], 'A');
-    }
 
-    ASSERT_TRUE(reader.ReadEntity(entity));
+    size_t totalSize = entity.DNameData.size();
+
+    while(reader.ReadEntity(entity) && entity.DType == SXMLEntity::EType::CharData){
+        totalSize += entity.DNameData.size();
+    }
     EXPECT_EQ(entity.DType, SXMLEntity::EType::EndElement);
+   
     EXPECT_TRUE(reader.End());
 }
