@@ -5,6 +5,8 @@ struct COpenStreetMap::SImplementation{
     const std::string DOSMTag = "osm";
     const std::string DNodeTag = "node";
     const std::string DWayTag = "way";
+    std::vector<std::shared_ptr<SWay>> DWaysByIndex;
+    std::unordered_map<TWayID, std::shared_ptr<SWay>> DWaysByID;
 
 
     struct SNode: public CStreetMap::SNode{
@@ -13,6 +15,7 @@ struct COpenStreetMap::SImplementation{
         const std::string DNodeLonAttr = "lon";
         TNodeID DID;
         SLocation DLocation;
+        std::unordered_map<std::string,std::string> DAttributes;
 
         SNode(const SXMLEntity &entity){
             auto NodeID = std::stoull(entity.AttributeValue(DNodeIDAttr));
@@ -35,6 +38,7 @@ struct COpenStreetMap::SImplementation{
         }
         
         std::size_t AttributeCount() const noexcept override{
+            return DAttributes.size();
 
         }
         
@@ -53,6 +57,12 @@ struct COpenStreetMap::SImplementation{
     };
 
     struct SWay: public CStreetMap::SWay{
+        TWayID DID;
+        std::vector<TNodeID> DNodeIDs;
+        std::unordered_map<std::string, std::string> DAttributes;
+        SWay(const SXMLEntity &entity){
+            DID = std::stoull(entity.AttributeValue("id"));
+        }
         ~SWay(){
 
         }
@@ -118,12 +128,47 @@ struct COpenStreetMap::SImplementation{
         while(src->ReadEntity(TempEntity)){
             if(TempEntity.DType == SXMLEntity::EType::StartElement && TempEntity.DNameData == DNodeTag){
                 auto NewNode = std::make_shared<SNode>(TempEntity);
+                SXMLEntity Child;
+                while(src->ReadEntity(Child)){
+                    if(Child.DType == SXMLEntity::EType::StartElement && Child.DNameData == "tag"){
+                        NewNode->DAttributes[Child.AttributeValue("k")] = Child.AttributeValue("v");
+                        FindEndTag(src, "tag");
+                    }
+                    else if(Child.DType == SXMLEntity::EType::EndElement && Child.DNameData == DNodeTag){
+                        break;
+                    }
+                }
                 DNodesByIndex.push_back(NewNode);
                 DNodesByID[NewNode->ID()] = NewNode;
-                FindEndTag(src,DNodeTag);
+                // FindEndTag(src,DNodeTag);
+            }
+            else if(TempEntity.DType == SXMLEntity::EType::StartElement && TempEntity.DNameData == DWayTag){
+                auto NewWay = std::make_shared<SWay>(TempEntity);
+                SXMLEntity Child;
+                while(src->ReadEntity(Child)){
+                    if(Child.DType==SXMLEntity::EType::StartElement){
+                        if(Child.DNameData == "nd"){
+                            NewWay->DNodeIDs.push_back(std::stoull(Child.AttributeValue("ref")));
+                            FindEndTag(src, "nd");
+                        }
+                        else if(Child.DNameData == "tag"){
+                            NewWay->DAttributes[Child.AttributeValue("k")] = Child.AttributeValue("v");
+                            FindEndTag(src, "tag");
+                        }
+                    }
+                    else if(Child.DType == SXMLEntity::EType::EndElement && Child.DNameData == DWayTag){
+                        break;
+                    }
+                }
+
+                DWaysByIndex.push_back(NewWay);
+                DWaysByID[NewWay->ID()] = NewWay;
+            }
+            else if(TempEntity.DType == SXMLEntity::EType::EndElement &&TempEntity.DNameData == DOSMTag){
+                break;
             }
         }
-
+        return true;
 
     }
 
