@@ -159,31 +159,25 @@ struct CXMLBusSystem::SImplementation{
         }while((TempEntity.DType != SXMLEntity::EType::EndElement)||(TempEntity.DNameData != DStopsTag));
     }
 
-    void ParseRoute(std::shared_ptr< CXMLReader > systemsource){
-        SXMLEntity TempEntity;
-        // reads <route> start tag
-        if(!systemsource->ReadEntity(TempEntity, true)){
-            return;
-        }
-        if((TempEntity.DType == SXMLEntity::EType::StartElement) && (TempEntity.DNameData == DRouteTag)){
-            auto NewRoute = std::make_shared<SRoute>();
-            NewRoute->DName = TempEntity.AttributeValue(DRouteNameAttr);
+    void ParseRoute(std::shared_ptr< CXMLReader > systemsource, const SXMLEntity &routeEntity){
+        auto NewRoute = std::make_shared<SRoute>();
+        NewRoute->DName = routeEntity.AttributeValue(DRouteNameAttr);
 
-            // Parse stops inside route
-            SXMLEntity StopEntity;
-            do{
-                if(!systemsource->ReadEntity(StopEntity, true)){
-                    break;
-                }
-                if((StopEntity.DType == SXMLEntity::EType::StartElement) && (StopEntity.DNameData == DStopTag)){
-                    TStopID StopID = std::stoull(StopEntity.AttributeValue(DStopIDAttr));
-                    NewRoute->DStopsIDs.push_back(StopID);
-                }
-            }while((StopEntity.DType != SXMLEntity::EType::EndElement) || (StopEntity.DNameData != DRouteTag));
-            // store the route
-            DRoutesByIndex.push_back(NewRoute);
-            DRoutesByName[NewRoute->DName] = NewRoute;
-        }
+        // Parse stops inside route
+        SXMLEntity StopEntity;
+        do{
+            if(!systemsource->ReadEntity(StopEntity, true)){
+                break;
+            }
+            if((StopEntity.DType == SXMLEntity::EType::StartElement) && (StopEntity.DNameData == DStopTag)){
+                TStopID StopID = std::stoull(StopEntity.AttributeValue(DStopIDAttr));
+                NewRoute->DStopsIDs.push_back(StopID);
+            }
+        }while((StopEntity.DType != SXMLEntity::EType::EndElement) || (StopEntity.DNameData != DRouteTag));
+        // store the route
+        DRoutesByIndex.push_back(NewRoute);
+        DRoutesByName[NewRoute->DName] = NewRoute;
+        
     }
 
     void ParseRoutes(std::shared_ptr< CXMLReader > systemsource){
@@ -193,7 +187,7 @@ struct CXMLBusSystem::SImplementation{
                 return;
             }
             if((TempEntity.DType == SXMLEntity::EType::StartElement) && (TempEntity.DNameData == DRouteTag)){
-                ParseRoute(systemsource);
+                ParseRoute(systemsource, TempEntity);
             }
         }while((TempEntity.DType != SXMLEntity::EType::EndElement) || (TempEntity.DNameData != DRoutesTag));
     }
@@ -251,16 +245,36 @@ struct CXMLBusSystem::SImplementation{
     }
 
     SImplementation(std::shared_ptr< CXMLReader > systemsource, std::shared_ptr< CXMLReader > pathsource){
-        if(!FindStartTag(systemsource, DBusSystemTag)){
+        SXMLEntity Entity;
+        // reads<bussystem>
+        if(!systemsource->ReadEntity(Entity, true) || Entity.DType != SXMLEntity::EType::StartElement || Entity.DNameData != DBusSystemTag){
             return;
         }
-        // parse stops
-        if(FindStartTag(systemsource, DStopTag)){
-            ParseStops(systemsource);
+        bool IsEndBusSystemFound = false;
+        // loops until </bussystem>
+        while(systemsource->ReadEntity(Entity, true)){
+            if(Entity.DType == SXMLEntity::EType::StartElement){
+                if(Entity.DNameData == DStopsTag){
+                    // Parse <stops>
+                    ParseStops(systemsource);
+                }
+                else if(Entity.DNameData == DRoutesTag){
+                    // Parse <routes>
+                    ParseRoutes(systemsource);
+                }
+            }
+            // if </bussystem> never found then invalid xml
+            else if(Entity.DType == SXMLEntity::EType::EndElement && Entity.DNameData == DBusSystemTag){
+                IsEndBusSystemFound = true;
+                break;
+            }
         }
-        if(FindStartTag(systemsource, DRoutesTag)){
-            // parse routes
-            ParseRoutes(systemsource);
+        if(!IsEndBusSystemFound){
+            DStopsByIndex.clear();
+            DStopsByID.clear();
+            DRoutesByIndex.clear();
+            DRoutesByName.clear();
+            return;
         }
         ParsePaths(pathsource);
     }
