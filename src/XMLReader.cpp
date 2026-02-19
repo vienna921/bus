@@ -28,10 +28,21 @@ struct CXMLReader::SImplementation{
 
     static void ExpatCharacterData(void *data, const XML_Char *s, int len){
         SImplementation *This = (SImplementation *)data;
-        SXMLEntity TempEntity;
-        TempEntity.DNameData = std::string(s,len);
-        TempEntity.DType = SXMLEntity::EType::CharData;
-        This->DQueue.push(TempEntity);
+        // SXMLEntity TempEntity;
+        std::string Text(s, len);
+        if(!This->DQueue.empty()&&This->DQueue.back().DType == SXMLEntity::EType::CharData){
+            This->DQueue.back().DNameData += Text;
+        }
+        else{
+            SXMLEntity TempEntity;
+            TempEntity.DType = SXMLEntity::EType::CharData;
+            TempEntity.DNameData = Text;
+            This->DQueue.push(TempEntity);
+        }
+        
+        // TempEntity.DNameData = std::string(s,len);
+        // TempEntity.DType = SXMLEntity::EType::CharData;
+        // This->DQueue.push(TempEntity);
     }
 
     SImplementation(std::shared_ptr< CDataSource > src){

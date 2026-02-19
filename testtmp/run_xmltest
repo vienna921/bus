@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="7" failures="2" disabled="0" errors="0" time="0." timestamp="2026-02-19T01:10:32.462" name="AllTests">
+  <testsuite name="XMLReaderTest" tests="7" failures="2" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-02-19T01:10:32.462">
+    <testcase name="SimpleTest" file="testsrc/XMLReaderTest.cpp" line="5" status="run" result="completed" time="0." timestamp="2026-02-19T01:10:32.462" classname="XMLReaderTest" />
+    <testcase name="ElementTest" file="testsrc/XMLReaderTest.cpp" line="23" status="run" result="completed" time="0." timestamp="2026-02-19T01:10:32.462" classname="XMLReaderTest" />
+    <testcase name="CDataTest" file="testsrc/XMLReaderTest.cpp" line="52" status="run" result="completed" time="0." timestamp="2026-02-19T01:10:32.462" classname="XMLReaderTest" />
+    <testcase name="LongCDataTest" file="testsrc/XMLReaderTest.cpp" line="71" status="run" result="completed" time="0." timestamp="2026-02-19T01:10:32.462" classname="XMLReaderTest">
+      <failure message="testsrc/XMLReaderTest.cpp:83&#x0A;Expected equality of these values:&#x0A;  entity.DNameData.size()&#x0A;    Which is: 507&#x0A;  600&#x0A;" type=""><![CDATA[testsrc/XMLReaderTest.cpp:83
+Expected equality of these values:
+  entity.DNameData.size()
+    Which is: 507
+  600
+]]></failure>
+      <failure message="testsrc/XMLReaderTest.cpp:89&#x0A;Expected equality of these values:&#x0A;  entity.DType&#x0A;    Which is: 4-byte object &lt;02-00 00-00&gt;&#x0A;  SXMLEntity::EType::EndElement&#x0A;    Which is: 4-byte object &lt;01-00 00-00&gt;&#x0A;" type=""><![CDATA[testsrc/XMLReaderTest.cpp:89
+Expected equality of these values:
+  entity.DType
+    Which is: 4-byte object <02-00 00-00>
+  SXMLEntity::EType::EndElement
+    Which is: 4-byte object <01-00 00-00>
+]]></failure>
+      <failure message="testsrc/XMLReaderTest.cpp:91&#x0A;Value of: reader.End()&#x0A;  Actual: false&#x0A;Expected: true&#x0A;" type=""><![CDATA[testsrc/XMLReaderTest.cpp:91
+Value of: reader.End()
+  Actual: false
+Expected: true
+]]></failure>
+    </testcase>
+    <testcase name="SpecialCharacterTest" file="testsrc/XMLReaderTest.cpp" line="94" status="run" result="completed" time="0." timestamp="2026-02-19T01:10:32.462" classname="XMLReaderTest" />
+    <testcase name="InvalidXMLTest" file="testsrc/XMLReaderTest.cpp" line="112" status="run" result="completed" time="0." timestamp="2026-02-19T01:10:32.462" classname="XMLReaderTest" />
+    <testcase name="LongCharDataCrosses512Boundary" file="testsrc/XMLReaderTest.cpp" line="124" status="run" result="completed" time="0." timestamp="2026-02-19T01:10:32.462" classname="XMLReaderTest">
+      <failure message="testsrc/XMLReaderTest.cpp:136&#x0A;Expected equality of these values:&#x0A;  entity.DNameData.size()&#x0A;    Which is: 507&#x0A;  1024&#x0A;" type=""><![CDATA[testsrc/XMLReaderTest.cpp:136
+Expected equality of these values:
+  entity.DNameData.size()
+    Which is: 507
+  1024
+]]></failure>
+      <failure message="testsrc/XMLReaderTest.cpp:142&#x0A;Expected equality of these values:&#x0A;  entity.DType&#x0A;    Which is: 4-byte object &lt;02-00 00-00&gt;&#x0A;  SXMLEntity::EType::EndElement&#x0A;    Which is: 4-byte object &lt;01-00 00-00&gt;&#x0A;" type=""><![CDATA[testsrc/XMLReaderTest.cpp:142
+Expected equality of these values:
+  entity.DType
+    Which is: 4-byte object <02-00 00-00>
+  SXMLEntity::EType::EndElement
+    Which is: 4-byte object <01-00 00-00>
+]]></failure>
+      <failure message="testsrc/XMLReaderTest.cpp:143&#x0A;Value of: reader.End()&#x0A;  Actual: false&#x0A;Expected: true&#x0A;" type=""><![CDATA[testsrc/XMLReaderTest.cpp:143
+Value of: reader.End()
+  Actual: false
+Expected: true
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

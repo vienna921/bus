@@ -44,6 +44,7 @@ struct CXMLBusSystem::SImplementation{
             DDescription = description;
             return DDescription;
         }
+    };  
 
     // 
     bool FindStartTag(std::shared_ptr< CXMLReader > xmlsource, const std::string &starttag){
