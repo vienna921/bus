@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="7" failures="0" disabled="0" errors="0" time="0.002" timestamp="2026-02-20T02:12:38.721" name="AllTests">
-  <testsuite name="XMLBusSystemTest" tests="7" failures="0" disabled="0" skipped="0" errors="0" time="0.001" timestamp="2026-02-20T02:12:38.721">
-    <testcase name="StopParsing" file="testsrc/XMLBusSystemTest.cpp" line="5" status="run" result="completed" time="0.001" timestamp="2026-02-20T02:12:38.721" classname="XMLBusSystemTest" />
-    <testcase name="RouteParsing" file="testsrc/XMLBusSystemTest.cpp" line="39" status="run" result="completed" time="0." timestamp="2026-02-20T02:12:38.722" classname="XMLBusSystemTest" />
-    <testcase name="PathParsing" file="testsrc/XMLBusSystemTest.cpp" line="74" status="run" result="completed" time="0." timestamp="2026-02-20T02:12:38.723" classname="XMLBusSystemTest" />
-    <testcase name="LookupFailure" file="testsrc/XMLBusSystemTest.cpp" line="104" status="run" result="completed" time="0." timestamp="2026-02-20T02:12:38.723" classname="XMLBusSystemTest" />
-    <testcase name="EmptySystem" file="testsrc/XMLBusSystemTest.cpp" line="122" status="run" result="completed" time="0." timestamp="2026-02-20T02:12:38.723" classname="XMLBusSystemTest" />
-    <testcase name="ZeroStops" file="testsrc/XMLBusSystemTest.cpp" line="135" status="run" result="completed" time="0." timestamp="2026-02-20T02:12:38.723" classname="XMLBusSystemTest" />
-    <testcase name="InvalidXML" file="testsrc/XMLBusSystemTest.cpp" line="150" status="run" result="completed" time="0." timestamp="2026-02-20T02:12:38.723" classname="XMLBusSystemTest" />
+<testsuites tests="7" failures="0" disabled="0" errors="0" time="0." timestamp="2026-02-20T03:46:56.006" name="AllTests">
+  <testsuite name="XMLBusSystemTest" tests="7" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-02-20T03:46:56.006">
+    <testcase name="StopParsing" file="testsrc/XMLBusSystemTest.cpp" line="5" status="run" result="completed" time="0." timestamp="2026-02-20T03:46:56.006" classname="XMLBusSystemTest" />
+    <testcase name="RouteParsing" file="testsrc/XMLBusSystemTest.cpp" line="39" status="run" result="completed" time="0." timestamp="2026-02-20T03:46:56.006" classname="XMLBusSystemTest" />
+    <testcase name="PathParsing" file="testsrc/XMLBusSystemTest.cpp" line="74" status="run" result="completed" time="0." timestamp="2026-02-20T03:46:56.006" classname="XMLBusSystemTest" />
+    <testcase name="LookupFailure" file="testsrc/XMLBusSystemTest.cpp" line="104" status="run" result="completed" time="0." timestamp="2026-02-20T03:46:56.007" classname="XMLBusSystemTest" />
+    <testcase name="EmptySystem" file="testsrc/XMLBusSystemTest.cpp" line="122" status="run" result="completed" time="0." timestamp="2026-02-20T03:46:56.007" classname="XMLBusSystemTest" />
+    <testcase name="ZeroStops" file="testsrc/XMLBusSystemTest.cpp" line="135" status="run" result="completed" time="0." timestamp="2026-02-20T03:46:56.007" classname="XMLBusSystemTest" />
+    <testcase name="InvalidXML" file="testsrc/XMLBusSystemTest.cpp" line="150" status="run" result="completed" time="0." timestamp="2026-02-20T03:46:56.007" classname="XMLBusSystemTest" />
   </testsuite>
 </testsuites>

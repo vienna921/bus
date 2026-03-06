@@ -1,10 +1,12 @@
 #include "XMLBusSystem.h"
+// vector container = fast index lookup
 #include <vector>
+// unordered map = fast ID lookup
 #include <unordered_map>
 #include <iostream>
 using std::cout;
 using std::endl;
-
+// PIMPL pattern where SImplementation hides the real data + logi
 struct CXMLBusSystem::SImplementation{
     const std::string DBusSystemTag = "bussystem";
     const std::string DStopsTag = "stops";
@@ -22,17 +24,18 @@ struct CXMLBusSystem::SImplementation{
     const std::string DNodeIDAttr = "id";
 
     
-
+    // implements abstract interface
     struct SStop : public CBusSystem::SStop{
         TStopID DID = 0;;
         CStreetMap::TNodeID DNodeID = 0;
         std::string DDescription;
-
+        // constructor
         SStop(TStopID id, CStreetMap::TNodeID nodeid, const std::string &description){
             DID = id;
             DNodeID = nodeid;
             DDescription = description;
         }
+        // destructor
         ~SStop(){};
         // Bus System Stop member functions
         // Returns the stop id of the stop
@@ -53,7 +56,7 @@ struct CXMLBusSystem::SImplementation{
             return DDescription;
         }
     };  
-
+    
     struct SRoute : public CBusSystem::SRoute{
         std::string DName;
         std::vector<CBusSystem::TStopID> DStopsIDs;
@@ -134,24 +137,30 @@ struct CXMLBusSystem::SImplementation{
     std::vector<std::shared_ptr<SPath>> DPaths;
 
     void ParseStop(std::shared_ptr< CXMLReader > systemsource, const SXMLEntity &stop){
+        // stoull mean string to unsigned long long
         TStopID StopID = std::stoull(stop.AttributeValue(DStopIDAttr));
         CStreetMap::TNodeID NodeID = std::stoull(stop.AttributeValue(DStopNodeAttr));
+        // creates stop object
         auto NewStop = std::make_shared<SStop>(StopID, NodeID, stop.AttributeValue(DStopDescAttr));
+        // stores for index lookup
         DStopsByIndex.push_back(NewStop);
         cout<<"DStopsByIndex "<<DStopsByIndex.size()<<endl;
+        // stores for ID lookup
         DStopsByID[StopID] = NewStop;
         FindEndTag(systemsource,DStopTag);
     }
 
     void ParseStops(std::shared_ptr< CXMLReader > systemsource){
         SXMLEntity TempEntity;
-
+        // keep reading until we find an end element name stops
         do{
+            // systemsource->ReasEntity(TempEntity, true) = reads next XML piece and fill TempEntity
+            // if reading next XML element fails, exit function
             if(!systemsource->ReadEntity(TempEntity,true)){
-
                 return;
             }
             cout<<int(TempEntity.DType)<<" '"<<TempEntity.DNameData<<"'"<<endl;
+            // if we found <stop>, call ParseStop
             if((TempEntity.DType == SXMLEntity::EType::StartElement) &&(TempEntity.DNameData == DStopTag)){
                 ParseStop(systemsource,TempEntity);
             }
