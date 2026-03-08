@@ -138,13 +138,12 @@ TEST_TPCL_TARGET		= $(TESTBIN_DIR)/testtpcl
 all: 	directories 		\
 		make_svglib 		\
 		run_svgtest 		\
-		$(TRIPPLANNER_TARGET) \
-		run_sinktest 		\
 		run_sourcetest 		\
-		run_svgwritertest 	\
-		run_tpcltest		\
-		run_osmtest			\
+		run_sinktest 		\
 		run_xmltest			\
+		run_svgwritertest 	\
+		run_xmlbstest 		\
+		run_osmtest			\
 		run_filedstest		\
 		run_bsitest			\
 		run_geotest			\
@@ -153,7 +152,8 @@ all: 	directories 		\
 		run_texttpwtest		\
 		run_svgtpwtest		\
 		run_htmltpwtest		\
-		run_xmlbstest 		\
+		run_tpcltest		\
+		$(TRIPPLANNER_TARGET) \
 		gen_html
 
 run_svgtest: $(TEST_SVG_TARGET)
