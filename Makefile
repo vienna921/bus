@@ -21,7 +21,7 @@ DEFINES				=
 INCLUDE				= -I $(INC_DIR) `pkg-config --cflags $(PKGS)`
 ARFLAGS				= rcs
 CFLAGS				= -Wall
-CPPFLAGS			= -std=c++20
+CPPFLAGS			= --std=c++20
 LDFLAGS				= `pkg-config --libs $(PKGS)`
 
 TEST_CFLAGS			= $(CFLAGS) -O0 -g --coverage
@@ -51,9 +51,11 @@ TEST_XML_OBJ 			= $(TESTOBJ_DIR)/XMLReader.o
 TEST_XML_TEST_OBJ		=$(TESTOBJ_DIR)/XMLReaderTest.o
 TEST_XML_OBJ_FILES		=$(TEST_STRSRC_OBJ) $(TEST_XML_OBJ) $(TEST_XML_TEST_OBJ)
 
-TEST_FILEDS_OBJ			=$(TESTOBJ_DIR)/FileDataSource.o
-TEST_FILEDS_TEST_OBJ	=$(TESTOBJ_DIR)/FileDataSourceTest.o
-TEST_FILEDS_OBJ_FILES	=$(TEST_FILEDS_OBJ) $(TEST_FILEDS_TEST_OBJ)
+TEST_FILEDSS_OBJ		=$(TESTOBJ_DIR)/FileDataSource.o
+TEST_FILEDSS_FACTORY_OBJ=$(TESTOBJ_DIR)/FileDataFactory.o
+TEST_FILEDSS_SINK_OBJ	=$(TESTOBJ_DIR)/FileDataSink.o
+TEST_FILEDSS_TEST_OBJ	=$(TESTOBJ_DIR)/FileDataSSTest.o
+TEST_FILEDSS_OBJ_FILES	=$(TEST_FILEDSS_OBJ) $(TEST_FILEDSS_SINK_OBJ) $(TEST_FILEDSS_FACTORY_OBJ) $(TEST_FILEDSS_TEST_OBJ)
 
 TEST_BSI_OBJ			=$(TESTOBJ_DIR)/BusSystemIndexer.o
 TEST_BSI_TEST_OBJ		=$(TESTOBJ_DIR)/BusSystemIndexerTest.o
@@ -121,7 +123,7 @@ TEST_STRSINK_TARGET 	= $(TESTBIN_DIR)/teststrdatasink
 TEST_STRSRC_TARGET 		= $(TESTBIN_DIR)/teststrdatasource
 TEST_SVGWRITER_TARGET   = $(TESTBIN_DIR)/testsvgwriter
 TEST_XML_TARGET			= $(TESTBIN_DIR)/testxml
-TEST_FILEDS_TARGET		= $(TESTBIN_DIR)/testfiledatasource
+TEST_FILEDSS_TARGET		= $(TESTBIN_DIR)/testfiledatass
 TEST_BSI_TARGET			= $(TESTBIN_DIR)/testbussystemindexer
 TEST_GEO_TARGET			= $(TESTBIN_DIR)/testgeographicutils
 TEST_SMI_TARGET			= $(TESTBIN_DIR)/teststreetmapindexer
@@ -144,7 +146,7 @@ all: 	directories 		\
 		run_svgwritertest 	\
 		run_xmlbstest 		\
 		run_osmtest			\
-		run_filedstest		\
+		run_filedsstest		\
 		run_bsitest			\
 		run_geotest			\
 		run_smitest			\
@@ -182,8 +184,8 @@ run_xmltest: $(TEST_XML_TARGET)
 	$(TEST_XML_TARGET) 	--gtest_output=xml:$(TESTTMP_DIR)/$@
 	mv $(TESTTMP_DIR)/$@ $@
 
-run_filedstest: $(TEST_FILEDS_TARGET)
-	$(TEST_FILEDS_TARGET) 	--gtest_output=xml:$(TESTTMP_DIR)/$@
+run_filedsstest: $(TEST_FILEDSS_TARGET)
+	$(TEST_FILEDSS_TARGET) 	--gtest_output=xml:$(TESTTMP_DIR)/$@
 	mv $(TESTTMP_DIR)/$@ $@
 
 run_bsitest: $(TEST_BSI_TARGET)
@@ -245,8 +247,8 @@ $(TEST_SVGWRITER_TARGET): $(TEST_SVGWRITER_OBJ_FILES) $(SVGLIB_TARGET)
 $(TEST_XML_TARGET): $(TEST_XML_OBJ_FILES)
 	$(CXX) $(TEST_CFLAGS) $(TEST_CPPFLAGS) $(TEST_XML_OBJ_FILES) $(TEST_LDFLAGS) -o $(TEST_XML_TARGET)
 
-$(TEST_FILEDS_TARGET): $(TEST_FILEDS_OBJ_FILES)
-	$(CXX) $(TEST_CFLAGS) $(TEST_CPPFLAGS) $(TEST_FILEDS_OBJ_FILES) $(TEST_LDFLAGS) -o $(TEST_FILEDS_TARGET)
+$(TEST_FILEDSS_TARGET): $(TEST_FILEDSS_OBJ_FILES)
+	$(CXX) $(TEST_CFLAGS) $(TEST_CPPFLAGS) $(TEST_FILEDSS_OBJ_FILES) $(TEST_LDFLAGS) -o $(TEST_FILEDSS_TARGET)
 
 $(TEST_BSI_TARGET): $(TEST_BSI_OBJ_FILES)
 	$(CXX) $(TEST_CFLAGS) $(TEST_CPPFLAGS) $(TEST_BSI_OBJ_FILES) $(TEST_LDFLAGS) -o $(TEST_BSI_TARGET)

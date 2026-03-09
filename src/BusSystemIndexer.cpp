@@ -11,18 +11,19 @@ struct CBusSystemIndexer::SImplementation{
     std::unordered_map<std::string, std::shared_ptr<SRouteIndexer>> DRouteByName;
     std::unordered_map<TStopID, std::unordered_set<std::string>> DStopToRoutes;
 };
+
 class CRouteIndexer : public CBusSystemIndexer::SRouteIndexer{
     public:
-        size_t FindStopIndex(TStopID stopid, size_t start = 0) const override{
-            for(size_t i = start; i < StopIDs.size(); i++){
-                if(StopIDs[i] == stopid){
+        size_t FindStopIndex(CBusSystemIndexer::TStopID stopid, size_t start = 0) const override{
+            for(size_t i = start; i < StopCount(); i++){
+                if(GetStopID(i) == stopid){
                     return i;
                 }
             }
             return std::numeric_limits<size_t>::max();
         }
-        std::vector<TStopID> StopIDsSourceDestination(TStopID src, TStopID dest) const override {
-            std::vector<TStopID> Result;
+        std::vector<CBusSystemIndexer::TStopID> StopIDsSourceDestination(CBusSystemIndexer::TStopID src, CBusSystemIndexer::TStopID dest) const override {
+            std::vector<CBusSystemIndexer::TStopID> Result;
             auto SrcIndex = FindStopIndex(src);
             if(SrcIndex == std::numeric_limits<size_t>::max()){
                 return Result;
@@ -32,7 +33,7 @@ class CRouteIndexer : public CBusSystemIndexer::SRouteIndexer{
                 return Result;
             }
             for(size_t i = SrcIndex; i<=DestIndex; i++){
-                Result.push_back(StopIDs[i]);
+                Result.push_back(GetStopID(i));
             }
             return Result;
         }
@@ -110,7 +111,7 @@ noexcept{
     return DImplementation->DSortedRoutes[index];
 }
 // Finds all names of routes that stop at the stopid
-bool CBusSystemIndexer::RoutesByStopID(TStopID stopid, std::unordered_set< std::string >
+bool CBusSystemIndexer::RoutesByStopID(CBusSystemIndexer::TStopID stopid, std::unordered_set< std::string >
 &routes) const noexcept{
     auto indexer = DImplementation->DStopToRoutes.find(stopid);
     if(indexer == DImplementation->DStopToRoutes.end()){
@@ -120,7 +121,7 @@ bool CBusSystemIndexer::RoutesByStopID(TStopID stopid, std::unordered_set< std::
     return true;
 }
 // Finds all routes that have the src and dest in their route.
-bool CBusSystemIndexer::RoutesByStopIDs(TStopID src, TStopID dest, std::unordered_set<
+bool CBusSystemIndexer::RoutesByStopIDs(CBusSystemIndexer::TStopID src, CBusSystemIndexer::TStopID dest, std::unordered_set<
 std::string > &routes) const noexcept{
     auto Src = DImplementation->DStopToRoutes.find(src);
     auto Dest = DImplementation->DStopToRoutes.find(dest);
@@ -137,7 +138,7 @@ std::string > &routes) const noexcept{
 }
 // Finds all stops that have a the two routes in common
 bool CBusSystemIndexer::StopIDsByRoutes(const std::string &route1, const std::string &route2,
-std::unordered_set< TStopID > &stops) const noexcept{
+std::unordered_set< CBusSystemIndexer::TStopID > &stops) const noexcept{
     auto R1 = RouteByName(route1);
     auto R2 = RouteByName(route2);
     if(!R1 || !R2){
@@ -155,18 +156,18 @@ std::unordered_set< TStopID > &stops) const noexcept{
 // SRouteIndexer specific functions
 // Finds the stop index of the stopid starting at start. If it is not found,
 // std::numeric_limits<size_t>::max() is returned.
-size_t SRouteIndexer::FindStopIndex(TStopID stopid, size_t start = 0) const{
-    for(size_t i = start; i<Route->StopIDs.size(); i++){
-        if(Route->StopIDs[i] == stopid){
+size_t SRouteIndexer::FindStopIndex(CBusSystemIndexer::ID stopid, size_t start = 0) const{
+    for(size_t i = start; i<Route->StopCount(); i++){
+        if(Route->GetStopID(i) == stopid){
             return i;
         }
     }
     return std::numeric_limits<size_t>::max();
 }
 // Returns the stop IDs of the stops between the src and destination.
-std::vector< TStopID > SRouteIndexer::StopIDsSourceDestination(TStopID src, TStopID dest)
+std::vector< CBusSystemIndexer::TStopID > SRouteIndexer::StopIDsSourceDestination(CBusSystemIndexer::TStopID src, CBusSystemIndexer::TStopID dest)
 const{
-    std::vector<TStopID> result;
+    std::vector<CBusSystemIndexer::TStopID> result;
     auto srcIndex = FindStopIndex(src);
     auto destIndex = FindStopIndex(dest, srcIndex);
 
@@ -174,7 +175,7 @@ const{
         return result;
     }
     for(size_t i = srcIndex; i<= destIndex; i++){
-        result.push_back(Route->StopIDs[i]);
+        result.push_back(Route->GetStopID(i));
     }
     return result;
 }

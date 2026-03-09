@@ -60,6 +60,7 @@ struct CXMLBusSystem::SImplementation{
     struct SRoute : public CBusSystem::SRoute{
         std::string DName;
         std::vector<CBusSystem::TStopID> DStopsIDs;
+        std::vector<std::vector<CBusSystem::TStopTime>> DStopTimes;
 
         SRoute(const std::string &name = "") : DName(name){
 
@@ -74,12 +75,24 @@ struct CXMLBusSystem::SImplementation{
         std::size_t StopCount() const noexcept override{
             return DStopsIDs.size();
         }
+        // Trip Count
+        std::size_t TripCount() const noexcept override{
+            return DStopTimes.size();
+        }
         CBusSystem::TStopID GetStopID(std::size_t index) const noexcept override{
             if(index < DStopsIDs.size()){
                 return DStopsIDs[index];
             }
             return CBusSystem::InvalidStopID;
         }
+        // Get Stop Time
+        CBusSystem::TStopTime GetStopTime(std::size_t stopindex, std::size_t tripindex) const noexcept override{
+            if(tripindex>= DStopTimes.size()){
+                return CBusSystem::TStopTime(std::chrono::seconds(0));
+            }
+            return DStopTimes[tripindex][stopindex];
+        }
+
     };
 
     struct SPath : public CBusSystem::SPath{
@@ -341,6 +354,20 @@ struct CXMLBusSystem::SImplementation{
             }
         }
         return nullptr;
+        // auto startStop = StopByID(start);
+        // auto endStop = StopByID(end);
+        // if(!startStop || !endStop){
+        //     return nullptr;
+        // }
+        // auto startNode = startStop->NodeID();
+        // auto endNode = endStop->NodeID();
+
+        // for(auto &path : DPaths){
+        //     if(path->StartNodeID() == startNode && path->EndNodeID() == endNode){
+        //         return path;
+        //     }
+        // }
+        // return nullptr;
     }
     
 };
