@@ -140,6 +140,7 @@ TEST(XMLBusSystemTest, EmptySystem){
     // contains nothing but system should load
     EXPECT_EQ(BusSystem.StopCount(), 0);
     EXPECT_EQ(BusSystem.RouteCount(), 0);
+}
 // stops section exists but empty
 TEST(XMLBusSystemTest, ZeroStops){
     auto BusRouteSource = std::make_shared<CStringDataSource>( "<bussystem>\n"
