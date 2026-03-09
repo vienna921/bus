@@ -10,6 +10,7 @@ ECS 36B WQ 25 Project 2-4
 * [std::make_unique] https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique
 * [auto (C++)] https://learn.microsoft.com/en-us/cpp/cpp/auto-cpp?view=msvc-170
 * [std::stoull] https://en.cppreference.com/w/cpp/string/basic_string/stoul
+* [std::sort] https://en.cppreference.com/w/cpp/algorithm/sort.html
 
 
 
@@ -746,3 +747,654 @@ If you want, you can paste your class and I’ll tell you exactly whether you ne
 
 ### Changes 2
 no changes were made -- just clarification
+
+
+
+### Prompt 3
+can you break down what this osm xml means
+
+"<osm version=\"0.6\" generator=\"osmconvert 0.8.5\">\n"
+	                                                            "  <node id=\"1\" lat=\"38.5\" lon=\"-121.7\"/>\n"
+	                                                            "  <node id=\"2\" lat=\"38.5\" lon=\"-121.8\"/>\n"
+                                                                "  <way id=\"1000\">\n"
+                                                                "    <nd ref=\"1\"/>\n"
+		                                                        "    <nd ref=\"2\"/>\n"
+                                                                "  </way>\n"
+                                                                "</osm>"
+
+
+### Response 3
+Let’s break this down step by step. You’re looking at **OSM XML**, which is a file format used by **OpenStreetMap** to describe map data like points (nodes), roads (ways), and areas.
+
+Here’s the cleaned-up version of your XML (without the C-style string formatting):
+
+```xml
+<osm version="0.6" generator="osmconvert 0.8.5">
+  <node id="1" lat="38.5" lon="-121.7"/>
+  <node id="2" lat="38.5" lon="-121.8"/>
+  <way id="1000">
+    <nd ref="1"/>
+    <nd ref="2"/>
+  </way>
+</osm>
+```
+
+---
+
+## 1️⃣ `<osm>` — The Root Element
+
+```xml
+<osm version="0.6" generator="osmconvert 0.8.5">
+```
+
+This is the **container** for all map data inside the file.
+
+* `version="0.6"` → OSM XML format version
+* `generator="osmconvert 0.8.5"` → The tool that created the file (osmconvert)
+
+Everything inside belongs to this map dataset.
+
+---
+
+## 2️⃣ `<node>` — Map Points
+
+```xml
+<node id="1" lat="38.5" lon="-121.7"/>
+<node id="2" lat="38.5" lon="-121.8"/>
+```
+
+A **node** is a single geographic point defined by latitude and longitude.
+
+Each node has:
+
+* `id` → unique identifier
+* `lat` → latitude
+* `lon` → longitude
+
+So here we have:
+
+| Node ID | Latitude | Longitude |
+| ------- | -------- | --------- |
+| 1       | 38.5     | -121.7    |
+| 2       | 38.5     | -121.8    |
+
+These are two points that lie horizontally apart (same latitude, different longitude).
+
+If you plotted them, they’d form a short horizontal line west-east.
+
+---
+
+## 3️⃣ `<way>` — A Line (or Road)
+
+```xml
+<way id="1000">
+```
+
+A **way** is an ordered list of nodes. It usually represents:
+
+* A road
+* A path
+* A boundary
+* Or the outline of an area
+
+The `id="1000"` is just the unique identifier for this way.
+
+---
+
+## 4️⃣ `<nd ref="..."/>` — Node References
+
+Inside the way:
+
+```xml
+<nd ref="1"/>
+<nd ref="2"/>
+```
+
+These mean:
+
+* Use node with ID 1
+* Then use node with ID 2
+
+So this way connects:
+
+Node 1 → Node 2
+
+That forms a straight line between those two coordinates.
+
+---
+
+## 🔎 What This Entire File Represents
+
+This file defines:
+
+* Two geographic points
+* One line connecting them
+
+Visually:
+
+```
+(38.5, -121.7)  --------  (38.5, -121.8)
+     Node 1                    Node 2
+```
+
+So effectively: **a single straight line segment between two map points.**
+
+---
+
+## 🧠 Conceptual Summary
+
+In OpenStreetMap:
+
+* **Node = point**
+* **Way = ordered list of points**
+* Ways reference nodes using `<nd ref="ID"/>`
+* The `<osm>` tag wraps everything
+
+This is the simplest possible example of a road-like structure.
+
+---
+
+If you'd like, I can also explain:
+
+* How areas (polygons) work
+* What relations are
+* How tags (like highway=primary) get added
+* Or how you would parse this in C++
+
+Just tell me what direction you want to go 🚀
+
+
+
+### Changes 3
+just needed clarification on file formatting
+
+
+
+
+
+### Prompt 4
+does unordered_map scramble things
+
+### Response 4
+Yes — **`std::unordered_map` absolutely “scrambles” things** (but in a very specific way).
+
+It does **not** keep things in the order you inserted them.
+
+Let’s break it down clearly.
+
+---
+
+## 🔹 What `unordered_map` Actually Does
+
+`std::unordered_map` is implemented using a **hash table**.
+
+That means:
+
+1. Your key goes into a **hash function**
+2. The hash determines which **bucket** it goes into
+3. Internally, elements are arranged by hash, not insertion order
+
+So when you iterate:
+
+```cpp
+std::unordered_map<std::string, int> m;
+m["apple"] = 1;
+m["banana"] = 2;
+m["cherry"] = 3;
+
+for (auto &pair : m) {
+    std::cout << pair.first << "\n";
+}
+```
+
+You might get:
+
+```
+banana
+apple
+cherry
+```
+
+Or something else entirely.
+
+The order is:
+
+* ❌ Not sorted
+* ❌ Not insertion order
+* ✅ Based on hash bucket placement
+
+---
+
+## 🔹 Does It Randomize Every Time?
+
+Important detail:
+
+It is **not randomly shuffled each time**.
+
+The order is:
+
+* Deterministic for a given run
+* But depends on the hash function and bucket layout
+* Can change if the table rehashes
+
+If you insert more elements and it resizes, the internal layout may change → iteration order may change.
+
+---
+
+## 🔹 Why This Matters
+
+If your code depends on order like:
+
+```cpp
+for (auto it = DAttributes.begin(); it != DAttributes.end(); ++it)
+```
+
+You CANNOT assume:
+
+* First inserted comes first
+* Alphabetical order
+* Any predictable ordering
+
+This is especially important if you're:
+
+* Printing attributes
+* Comparing output
+* Writing deterministic tests
+
+---
+
+## 🔹 If You Need Order
+
+### Keep insertion order?
+
+Use:
+
+```cpp
+std::map
+```
+
+(ordered by key)
+
+### Keep sorted by key?
+
+Use:
+
+```cpp
+std::map
+```
+
+(sorted automatically)
+
+### Keep insertion order specifically?
+
+C++ standard library doesn’t provide this directly — you’d need:
+
+* `std::vector + std::unordered_map`
+* Or a custom structure
+
+---
+
+## 🔹 Quick Mental Model
+
+Think of:
+
+* `std::map` → organized bookshelf (sorted)
+* `std::unordered_map` → tossed into labeled bins by hash
+* `std::vector` → stack in order added
+
+---
+
+If you’re debugging something with `DAttributes` (which looks like an `unordered_map`), tell me what weird behavior you're seeing and we’ll dissect it like engineers 🧠💻
+
+
+### Changes 4
+i was having trouble with insertion order so this helped clear it up
+i switched it to vector pair
+
+
+
+
+
+### Prompt 5
+how does .find() work
+
+
+### Response 5
+
+`.find()` is used to **search for something inside a container** and tell you **where it is** (or if it exists). The exact behavior depends on the language or container you're using. Since you’ve been working with **C++ `unordered_map` and `map`** recently, I’ll explain that version first.
+
+---
+
+# 1. `.find()` in C++ `map` / `unordered_map`
+
+For containers like:
+
+```cpp
+std::unordered_map<KeyType, ValueType> myMap;
+```
+
+`.find(key)` **searches for the key**.
+
+### Syntax
+
+```cpp
+auto it = myMap.find(key);
+```
+
+### What it returns
+
+It returns an **iterator**.
+
+* If the key **exists** → iterator points to the element
+* If the key **does not exist** → iterator equals `myMap.end()`
+
+---
+
+### Example
+
+```cpp
+std::unordered_map<std::string, int> ages;
+
+ages["Alice"] = 20;
+ages["Bob"] = 25;
+
+auto it = ages.find("Alice");
+```
+
+Now `it` points to:
+
+```
+("Alice", 20)
+```
+
+---
+
+### Checking if something exists
+
+```cpp
+auto it = ages.find("Alice");
+
+if (it != ages.end()) {
+    std::cout << "Found it!\n";
+}
+```
+
+Explanation:
+
+* `.end()` means **past the last element**
+* If `.find()` returns `.end()` → it **wasn't found**
+
+---
+
+# 2. Accessing the value
+
+If you find something:
+
+```cpp
+auto it = ages.find("Alice");
+
+if (it != ages.end()) {
+    std::cout << it->second;
+}
+```
+
+Why `second`?
+
+Because a map stores **pairs**:
+
+```
+(key, value)
+```
+
+Internally:
+
+```
+pair<string, int>
+```
+
+So:
+
+| Part         | Meaning |
+| ------------ | ------- |
+| `it->first`  | key     |
+| `it->second` | value   |
+
+Example:
+
+```cpp
+std::cout << it->first;  // Alice
+std::cout << it->second; // 20
+```
+
+---
+
+# 3. Why `.find()` is useful
+
+Using `[]` can accidentally **create new entries**.
+
+Example:
+
+```cpp
+ages["Charlie"];
+```
+
+This **adds Charlie with value 0**.
+
+But `.find()` **does NOT create anything**.
+
+So it's safer for searching.
+
+---
+
+# 4. Time Complexity (what O(1) means)
+
+You also asked about `O(1)` earlier.
+
+| Container       | `.find()` speed  |
+| --------------- | ---------------- |
+| `unordered_map` | **O(1)** average |
+| `map`           | **O(log n)**     |
+
+Meaning:
+
+* **O(1)** → constant time (very fast)
+* **O(log n)** → slightly slower but still efficient
+
+`unordered_map` uses **hash tables**, which is why lookups are fast.
+
+---
+
+# 5. Visual example
+
+If your map is:
+
+```
+{
+  "A" → 10
+  "B" → 20
+  "C" → 30
+}
+```
+
+Then:
+
+```cpp
+auto it = myMap.find("B");
+```
+
+`it` points to:
+
+```
+("B", 20)
+```
+
+So:
+
+```cpp
+it->first  = "B"
+it->second = 20
+```
+
+---
+
+# 6. In your StreetMapIndexer context
+
+You might see something like:
+
+```cpp
+auto search = NodeIndex.find(nodeID);
+
+if(search != NodeIndex.end()) {
+    location = search->second;
+}
+```
+
+Meaning:
+
+1. Look for `nodeID`
+2. If it exists
+3. Get the stored value (`second`)
+
+---
+
+✅ **Simple way to remember**
+
+```
+.find(key)
+
+returns → iterator
+iterator->first  = key
+iterator->second = value
+```
+
+---
+
+If you want, I can also explain **how `.find()` actually works internally in an `unordered_map` (hash tables)** — that’s super useful for understanding your **StreetMapIndexer project**.
+
+
+### Changes 5
+used it to check if a given node id exists in the DNodeToWays map & retrieve its associated set of ways
+
+
+
+### Prompt 6
+what is big O and how do you use it in c++
+
+
+### Response 6
+
+## 1. What Big O Is
+
+**Big O notation** (`O(...)`) describes **how the runtime of your code grows as the input grows**.
+
+* It **ignores constants** and focuses on the trend for large inputs.
+* It helps compare **algorithms**, e.g., searching, sorting, etc.
+
+### Common Big O Examples
+
+| Big O        | Name         | Example                       | Notes                                     |
+| ------------ | ------------ | ----------------------------- | ----------------------------------------- |
+| `O(1)`       | Constant     | Accessing `arr[5]`            | Takes the same time, no matter array size |
+| `O(log n)`   | Logarithmic  | Binary search                 | Time grows slowly as input increases      |
+| `O(n)`       | Linear       | Loop through array once       | Time grows directly with input size       |
+| `O(n log n)` | Linearithmic | Merge sort, quicksort average | Typical efficient sorts                   |
+| `O(n^2)`     | Quadratic    | Nested loops                  | Time grows fast as input increases        |
+| `O(2^n)`     | Exponential  | Recursive Fibonacci           | Very slow for large `n`                   |
+
+---
+
+## 2. How to Think About Big O in C++
+
+You **don’t “use” Big O directly** in code—it's **a way to analyze your code**.
+
+Instead, you **look at your loops, recursion, or data structures**:
+
+* **Single loop over `n` elements:** `O(n)`
+* **Nested loops:** `O(n^2)`
+* **Map lookups (`map` or `unordered_map`)**:
+
+  * `unordered_map.find(key)` → `O(1)` average, `O(n)` worst case
+  * `map.find(key)` → `O(log n)` (binary search tree)
+
+---
+
+### Examples
+
+#### Example 1: Linear search
+
+```cpp
+std::vector<int> v = {1,2,3,4,5};
+for(int i = 0; i < v.size(); i++) {
+    if(v[i] == 3) { 
+        std::cout << "Found!\n"; 
+    }
+}
+```
+
+* **Big O:** `O(n)`
+* Reason: You may have to check every element.
+
+---
+
+#### Example 2: Map lookup
+
+```cpp
+std::unordered_map<int, int> m;
+m[5] = 10;
+
+auto it = m.find(5);
+```
+
+* **Big O:** `O(1)` average (hash table lookup)
+* **It’s very fast**, even if the map has millions of entries.
+
+---
+
+#### Example 3: Nested loops
+
+```cpp
+for(int i = 0; i < n; i++) {
+    for(int j = 0; j < n; j++) {
+        // do something
+    }
+}
+```
+
+* **Big O:** `O(n^2)`
+* Reason: For each `i`, you run `n` iterations of `j`.
+
+---
+
+## 3. Why Big O Matters in C++
+
+* Helps **choose the right data structure** (vector vs. map vs. unordered_map)
+* Helps **predict performance** for large datasets
+* Makes code **scalable**, especially for projects like StreetMapIndexer
+
+Example:
+
+```cpp
+std::unordered_map<int, Node> NodeIndex;
+
+// Lookup by nodeID
+auto search = NodeIndex.find(nodeID);
+```
+
+* `.find()` → `O(1)` → very fast
+* If you used `std::vector` and looped → `O(n)` → slower for big maps
+
+---
+
+## 4. Tips to Estimate Big O
+
+1. **Count loops**: Each loop over `n` → `O(n)`, nested → multiply
+2. **Look at recursion**: Recursion depth matters
+3. **Check data structure operations**:
+
+   * `vector push_back` → O(1) amortized
+   * `map insert/find` → O(log n)
+   * `unordered_map insert/find` → O(1) average
+
+
+### Changes 6
+just needed clarification & helped me choose correct data structure
