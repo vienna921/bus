@@ -4,6 +4,7 @@
 #include "BusSystem.h"
 #include "BusSystemIndexer.h"
 #include <memory>
+#include <vector>
 
 class CTripPlanner{
     private:
