@@ -89,13 +89,14 @@ struct CTripPlanner::SImplementation{
             }
             
             // one-transfer route
+            TStopTime bestArrival(std::chrono::hours(24));
             for(size_t i=0; i<Indexer->RouteCount(); i++){
                 auto route1 = Indexer->SortedRouteByIndex(i);
                 size_t srcIndex = route1->FindStopIndex(src);
                 if(srcIndex == std::numeric_limits<size_t>::max()){
                     continue;
                 }
-                for(size_t j = 0; j<route1->StopCount(); j++){
+                for(size_t j = srcIndex + 1; j<route1->StopCount(); j++){
                     TStopID transfer = route1->GetStopID(j);
                     if(transfer==src || transfer == dest){
                         continue;
@@ -107,6 +108,9 @@ struct CTripPlanner::SImplementation{
                     }
                     for(const auto &rname2:connectingRoutes){
                         auto route2 = Indexer->RouteByName(rname2);
+                        if(!route2){
+                            continue;
+                        }
                         size_t transferIndex2 = route2->FindStopIndex(transfer);
                         size_t destIndex2 = route2->FindStopIndex(dest);
                         if(transferIndex2 == std::numeric_limits<size_t>::max()||destIndex2 == std::numeric_limits<size_t>::max()){
@@ -121,16 +125,21 @@ struct CTripPlanner::SImplementation{
 
                             for(size_t t2 = 0; t2<route2->TripCount(); t2++){
                                 auto departTransfer = route2->GetStopTime(transferIndex2, t2);
-                                if(departTransfer.to_duration() >= arriveTransfer.to_duration()){
+                                auto arrivalDest = route2->GetStopTime(destIndex2, t2);
+                                if(departTransfer.to_duration() >= arriveTransfer.to_duration() && arrivalDest.to_duration() < bestArrival.to_duration()){
+                                    bestArrival = arrivalDest;
+                                    plan.clear();
                                     plan.push_back({time1, src, route1->Name()});
                                     plan.push_back({departTransfer, transfer, route2->Name()});
-                                    plan.push_back({route2->GetStopTime(destIndex2, t2), dest, ""});
-                                    return true;
+                                    plan.push_back({arrivalDest, dest, ""});
                                 }
                             }
                         }
                     }
                 }
+            }
+            if(!plan.empty()){
+                return true;
             }
             return false;
         }
@@ -187,7 +196,7 @@ struct CTripPlanner::SImplementation{
                                 auto departSrc = route1->GetStopTime(srcIndex1, t1);
                                 if(arriveTransfer.to_duration() <= departTransfer.to_duration()){
                                     plan.push_back({departSrc, src, route1->Name()});
-                                    plan.push_back({arriveTransfer, transfer, route2->Name()});
+                                    plan.push_back({departTransfer, transfer, route2->Name()});
                                     plan.push_back({arrivalTime, dest, ""});
                                     return true;
                                 }
