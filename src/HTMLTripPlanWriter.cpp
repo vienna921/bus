@@ -1,9 +1,14 @@
 #include "HTMLTripPlanWriter.h"
 
 struct CHTMLTripPlanWriter::SImplementation{
+    std::shared_ptr<CStreetMap> DStreetMap;
+    std::shared_ptr<CBusSystem> DBusSystem;
+    std::shared_ptr<SConfig> DConfig;
 
     SImplementation(std::shared_ptr<CStreetMap> streetmap, std::shared_ptr<CBusSystem> bussystem){
-
+            DStreetMap = streetmap;
+            DBusSystem = bussystem;
+            DConfig = std::make_shared<SConfig>();
     }
     
     ~SImplementation(){
@@ -11,11 +16,20 @@ struct CHTMLTripPlanWriter::SImplementation{
     }
 
     std::shared_ptr<SConfig> Config() const{
-        return nullptr;
+        return DConfig;
     }
 
     bool WritePlan(std::shared_ptr<CDataSink> sink, const TTravelPlan &plan){
-        return false;
+        if (!sink){
+            return false;
+        }
+        sink->Write("<html><body><ul>\n");
+        for (const auto &step : plan){
+            std::string line = "<li>" + step.Description() + "</li>\n";
+            sink->Write(line);
+        }
+        sink->Write("</ul></body></html>\n");
+        return true;
     }
 };
 
