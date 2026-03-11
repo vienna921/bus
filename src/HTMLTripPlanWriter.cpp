@@ -3,12 +3,10 @@
 struct CHTMLTripPlanWriter::SImplementation{
     std::shared_ptr<CStreetMap> DStreetMap;
     std::shared_ptr<CBusSystem> DBusSystem;
-    std::shared_ptr<SConfig> DConfig;
 
     SImplementation(std::shared_ptr<CStreetMap> streetmap, std::shared_ptr<CBusSystem> bussystem){
             DStreetMap = streetmap;
             DBusSystem = bussystem;
-            DConfig = std::make_shared<SConfig>();
     }
     
     ~SImplementation(){
@@ -16,19 +14,21 @@ struct CHTMLTripPlanWriter::SImplementation{
     }
 
     std::shared_ptr<SConfig> Config() const{
-        return DConfig;
+        return nullptr;
     }
 
     bool WritePlan(std::shared_ptr<CDataSink> sink, const TTravelPlan &plan){
         if (!sink){
             return false;
         }
-        sink->Write("<html><body><ul>\n");
+        std::string html = "<html><body><ul>\n";
+        sink->Write(std::vector<char>(html.begin(), html.end()));
         for (const auto &step : plan){
-            std::string line = "<li>" + step.Description() + "</li>\n";
-            sink->Write(line);
+            std::string line = "<li>step</li>\n";
+            sink->Write(std::vector<char>(line.begin(), line.end()));
         }
-        sink->Write("</ul></body></html>\n");
+        std::string end = "</ul></body></html>\n";
+        sink->Write(std::vector<char>(end.begin(), end.end()));
         return true;
     }
 };
