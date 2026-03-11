@@ -4,12 +4,10 @@
 struct CSVGTripPlanWriter::SImplementation{
     std::shared_ptr<CStreetMap> DStreetMap;
     std::shared_ptr<CBusSystem> DBusSystem;
-    std::shared_ptr<SConfig> DConfig;
 
     SImplementation(std::shared_ptr<CStreetMap> streetmap, std::shared_ptr<CBusSystem> bussystem){
         DStreetMap = streetmap;
         DBusSystem = bussystem;
-        DConfig = std::make_shared<SConfig>();
     }
     
     ~SImplementation(){
@@ -17,7 +15,7 @@ struct CSVGTripPlanWriter::SImplementation{
     }
 
     std::shared_ptr<SConfig> Config() const{
-        return DConfig;
+        return nullptr;
     }
 
     bool WritePlan(std::shared_ptr<CDataSink> sink, const TTravelPlan &plan){
@@ -28,21 +26,27 @@ struct CSVGTripPlanWriter::SImplementation{
         int width = 800;
         int height = 800;
 
-        CSVGWriter writer(sink, width, height);
+        CSVGWriter writer(sink,width, height);
         TAttributes style;
-        style["stroke"] = "red";
-        style["stroke-width"] = "2";
-        style["fill"] = "none";
+        style.push_back({"stroke","red"});
+        style.push_back({"stroke-width","2"});
+        style.push_back({"fill","none"});
 
         for(size_t i = 0; i + 1 < plan.size(); i++){
-            auto from = plan[i].Location();
-            auto to = plan[i+1].Location();
-            SSVGPoint start;
-            start.DX = from.DLongitude;
-            start.DY = from.DLatitude;
-            SSVGPoint end;
-            end.DX = to.DLongitude;
-            end. DY = to.DLatitude;
+            auto fromStop = DBusSystem->StopByID(plan[i].DStopID);
+            auto fromNode = DStreetMap->NodeByIndex(fromStop->NodeID());
+            auto fromLoc = fromNode->Location();
+            auto toStop = DBusSystem->StopByID(plan[i+1].DStopID);
+            auto toNode = DStreetMap->NodeByIndex(toStop->NodeID());
+            auto toLoc = toNode->Location();
+            if(!fromStop || !toStop){
+                continue;
+            }
+            if (!fromNode || !toNode){
+                continue;
+            }
+            SSVGPoint start{fromLoc.DLongitude, fromLoc.DLatitude};
+            SSVGPoint end{toLoc.DLongitude, toLoc.DLatitude};
             writer.Line(start,end,style);
         }
         
