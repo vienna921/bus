@@ -19,7 +19,7 @@ struct CSVGTripPlanWriter::SImplementation{
     }
 
     bool WritePlan(std::shared_ptr<CDataSink> sink, const TTravelPlan &plan){
-        if (!sink){
+        if (!sink || plan.size() < 2){
             return false;
         }
 
@@ -34,19 +34,26 @@ struct CSVGTripPlanWriter::SImplementation{
 
         for(size_t i = 0; i + 1 < plan.size(); i++){
             auto fromStop = DBusSystem->StopByID(plan[i].DStopID);
-            auto fromNode = DStreetMap->NodeByIndex(fromStop->NodeID());
-            auto fromLoc = fromNode->Location();
             auto toStop = DBusSystem->StopByID(plan[i+1].DStopID);
-            auto toNode = DStreetMap->NodeByIndex(toStop->NodeID());
-            auto toLoc = toNode->Location();
             if(!fromStop || !toStop){
                 continue;
             }
+            auto fromNode = DStreetMap->NodeByIndex(fromStop->NodeID());
+            auto toNode = DStreetMap->NodeByIndex(toStop->NodeID());
             if (!fromNode || !toNode){
                 continue;
             }
-            SSVGPoint start{fromLoc.DLongitude, fromLoc.DLatitude};
-            SSVGPoint end{toLoc.DLongitude, toLoc.DLatitude};
+
+            if (fromStop->Description().empty() && fromNode->HasAttribute("name")){
+                fromStop->Description(fromNode->GetAttribute("name"));
+            }
+            if(toStop->Description().empty() && toNode->HasAttribute("name")){
+                toStop->Description(toNode->GetAttribute("name"));
+            }
+            auto fromLoc = fromNode->Location();
+            auto toLoc = toNode->Location();
+            SSVGPoint start{fromLoc.DLongitude, -fromLoc.DLatitude};
+            SSVGPoint end{toLoc.DLongitude, -toLoc.DLatitude};
             writer.Line(start,end,style);
         }
         
