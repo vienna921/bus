@@ -91,25 +91,34 @@ struct CTextTripPlanWriter::SImplementation{
                 std::string StayLine = " " + TimeString + ": Stay on the " + Step.DRouteName + " bus at " + StopName + " (stop " + std::to_string(Step.DStopID) + ").\n";
                 std::vector<char> StayOutput(StayLine.begin(), StayLine.end());
                 sink->Write(StayOutput);
-                continue;
+                
             }
             std::string Line;
+        
             if (i>0 && Step.DRouteName != "" && plan[i-1].DRouteName != Step.DRouteName){
                 auto Prev = plan[i-1];
                 std::string TransferLine = "        : Get off the " + Prev.DRouteName + " bus at " + StopName + " (stop " + std::to_string(Step.DStopID) + ") and wait for the " + Step.DRouteName + " bus.\n";
                 std::vector<char> TransferOutput(TransferLine.begin(), TransferLine.end());
                 sink->Write(TransferOutput);
             }
-            if(Step.DRouteName != ""){
-                Line = " " + TimeString + ": Take the " + Step.DRouteName + " bus from " + StopName + " (stop " + std::to_string(Step.DStopID) + ").\n";
+            if(i == 0 || Step.DRouteName != plan[i-1].DRouteName){
+                if(Step.DRouteName !=""){
+                    Line = " " + TimeString + ": Take the " + Step.DRouteName + " bus from " + StopName + " (stop " + std::to_string(Step.DStopID) + ").\n";
+                }
+                else if(i>0){
+                    auto Prev = plan[i-1];
+                    Line = " " + TimeString + ": Get off the " + Prev.DRouteName + " bus at " + StopName + " (stop " + std::to_string(Step.DStopID) + ").\n"; 
+                }
             }
-            else{
+            else if(Step.DRouteName == "" && i>0){
                 auto Prev = plan[i-1];
-                Line = " " + TimeString + ": Get off the " + Prev.DRouteName + " bus at " + StopName + " (stop " + std::to_string(Step.DStopID) + ").\n";
+                Line = " " + TimeString + ": Get off the " + Prev.DRouteName + " bus at " + StopName + " (stop " + std::to_string(Step.DStopID) + ").\n"; 
             }
-            std::vector<char> Output(Line.begin(), Line.end());
-            sink->Write(Output);
-        
+            if(!Line.empty()){
+                std::vector<char> Output(Line.begin(), Line.end());
+                sink->Write(Output);
+            }
+            
         }
         return true;
     }
