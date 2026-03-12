@@ -18,12 +18,27 @@ class SVGTripPlanWriter : public ::testing::Test{
         std::shared_ptr<CMockBusSystem> DBusSystem;
         std::shared_ptr<CStringDataSink> DDataSink;
         std::shared_ptr<CSVGTripPlanWriter> DPlanWriter;
+        // void SetUp() override{
+        //     DStreetMap = CMockStreetMap::CreateTestStreetMap();
+        //     DBusSystem = CMockBusSystem::CreateTestBusSystem();
+        //     DDataSink = std::make_shared<CStringDataSink>();
+        //     DPlanWriter = std::make_shared<CSVGTripPlanWriter>(DStreetMap, DBusSystem);
+
+        // }
         void SetUp() override{
             DStreetMap = CMockStreetMap::CreateTestStreetMap();
             DBusSystem = CMockBusSystem::CreateTestBusSystem();
             DDataSink = std::make_shared<CStringDataSink>();
             DPlanWriter = std::make_shared<CSVGTripPlanWriter>(DStreetMap, DBusSystem);
 
+            ON_CALL(*DStreetMap, NodeByIndex(testing::_))
+                .WillByDefault([this](int index){
+                    auto node = std::make_shared<SMockNode>();
+                    EXPECT_CALL(*node, ID()).WillRepeatedly(testing::Return(index));
+                    EXPECT_CALL(*node, Location())
+                        .WillRepeatedly(testing::Return(CStreetMap::SLocation{38.5 + (index / 10.0) * 0.25/69.0, -121.7 + (index % 10) * 0.25/54.2}));
+                    return node;
+                });
         }
 
         void TearDown() override{
