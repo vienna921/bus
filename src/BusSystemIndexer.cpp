@@ -172,6 +172,7 @@ bool CBusSystemIndexer::RoutesByStopIDs(TStopID src, TStopID dest, std::unordere
 }
 
 bool CBusSystemIndexer::StopIDsByRoutes(const std::string &route1, const std::string &route2, std::unordered_set<TStopID> &stops) const noexcept{
+    stops.clear();
     auto R1 = RouteByName(route1);
     auto R2 = RouteByName(route2);
     if(!R1 || !R2){
