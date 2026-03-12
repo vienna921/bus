@@ -86,13 +86,48 @@ struct CTextTripPlanWriter::SImplementation{
                 TimeString += "0";
             }
             TimeString += std::to_string(Minute) + " " + AMPM;
-           
-            if(DConfig->FlagEnabled(CTextTripPlanWriter::Verbose) && i>0 && Step.DRouteName == plan[i-1].DRouteName){
-                std::string StayLine = " " + TimeString + ": Stay on the " + Step.DRouteName + " bus at " + StopName + " (stop " + std::to_string(Step.DStopID) + ").\n";
-                std::vector<char> StayOutput(StayLine.begin(), StayLine.end());
-                sink->Write(StayOutput);
+            if(DConfig->FlagEnabled(CTextTripPlanWriter::Verbose) && i>0 ){
+                auto Prev = plan[i-1];
+                if(Prev.DRouteName != ""){
+                    auto Route = DBusSystem->RouteByName(Prev.DRouteName);
+                    size_t PrevIndex = 0;
+                    size_t CurrIndex = 0;
+                    for(size_t j =0; j<Route->StopCount(); j++){
+                        if(Route->GetStopID(j) == Prev.DStopID){
+                            PrevIndex = j;
+                        }
+                        if(Route->GetStopID(j) == Step.DStopID){
+                            CurrIndex = j;
+                        }
+                    }
+                    for(size_t j = PrevIndex + 1; j<CurrIndex; j++){
+                        auto StopID = Route->GetStopID(j);
+                        auto Stop = DBusSystem->StopByID(StopID);
+                        auto Time = Route->GetStopTime(j, 0);
+                        int H = Time.hours().count();
+                        int M = Time.minutes().count() % 60;
+
+                        std::string AMPM = (H>=12) ? "PM" : "AM";
+                        if(H>12){
+                            H-=12;
+                        }
+                        if(H == 0){
+                            H = 12;
+                        }
+                        std::string T = std::to_string(H) + ":";
+                        if(M<10){
+                            T+="0";
+                        }
+                        T+=std::to_string(M) + " " + AMPM;
+
+                        std::string StayLine = " " + T + ": Stay on the " + Prev.DRouteName + " bus at " + Stop->Description() + " (stop " + std::to_string(StopID) + ").\n";
+                        std::vector<char> StayOutput(StayLine.begin(), StayLine.end());
+                        sink->Write(StayOutput);
+                    }
+                }
                 
             }
+            
             std::string Line;
         
             if (i>0 && Step.DRouteName != "" && plan[i-1].DRouteName != Step.DRouteName){
