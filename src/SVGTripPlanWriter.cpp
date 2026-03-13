@@ -119,50 +119,216 @@ struct CSVGTripPlanWriter::SImplementation{
     std::shared_ptr<SConfig> Config() const{
         return DConfig;
     }
+    //draw circles
+        void drawCircle(CSVGWriter &writer, const SSVGPoint &pt, double radius, const std::string &color){
+            TAttributes style;
+            style.push_back({"fill", color});
+            style.push_back({"stroke", "black"});
+            style.push_back({"stroke-width", "1"});
+            writer.Circle(pt, radius, style);
+        }
+    
+    // converts geo coordinates to SVG pixel point
+        SSVGPoint toPoint(double lon, double lat, double minLon, double maxLat, double lonRange, double latRange, int margin, int drawW, int drawH){
+            SSVGPoint pt;
+            pt.DX = margin + (lon-minLon) / lonRange * drawW;
+            pt.DY = margin + (maxLat - lat) / latRange * drawH;
+            return pt;
+        }
+    // nodePoint
+        std::shared_ptr<CStreetMap::SNode> nodePoint(CStreetMap::TNodeID id){
+            return DStreetMap->NodeByID(id);
+        }
 
     bool WritePlan(std::shared_ptr<CDataSink> sink, const TTravelPlan &plan){
         if (!sink || plan.size() < 2){
             return false;
         }
+        auto cfg = std::dynamic_pointer_cast<SimpleConfig>(DConfig);
+        int width = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::SVGWidth));
+        int height = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::SVGHeight));
+        int margin = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::SVGMarginPixels));
+        
+        // bounding box
+        double minLon = 1e18, maxLon = -1e18;
+        double minLat = 1e18, maxLat = -1e18;
+        for(size_t i = 0; i<DStreetMap->NodeCount(); i++){
+            auto node = DStreetMap->NodeByIndex(i);
+            if(!node){
+                continue;
+            }
+            auto loc = node->Location();
+            if(loc.DLongitude<minLon){
+                minLon = loc.DLongitude;
+            }
+            if(loc.DLongitude>maxLon){
+                maxLon = loc.DLongitude;
+            }
+            if(loc.DLatitude<minLat){
+                minLat = loc.DLatitude;
+            }
+            if(loc.DLatitude>maxLat){
+                maxLat = loc.DLatitude;
+            }
+        }
 
-        int width = 800;
-        int height = 800;
+        double lonRange = maxLon - minLon ? maxLon-minLon : 1;
+        double latRange = maxLat-minLat ? maxLat - minLat : 1;
+        int drawW = width - 2 * margin;
+        int drawH = height - 2 * margin;
+    
         //write opening <svg> tag'
-        std::string svgHeader = "<svg width='" + std::to_string(width) + "' height='" + std::to_string(height) + "' xmlns='http://ww.w3.org/2000/svg'>\n";
+        std::string svgHeader = "<svg width='" + std::to_string(width) + "' height='" + std::to_string(height) + "' xmlns='http://www.w3.org/2000/svg'>\n";
         std::vector<char> buffer(svgHeader.begin(), svgHeader.end());
         sink->Write(buffer);
         CSVGWriter writer(sink,width, height);
-       
-        TAttributes style;
-        style.push_back({"stroke","red"});
-        style.push_back({"stroke-width","2"});
-        style.push_back({"fill","none"});
-        // draw all lines
+        
+        for(size_t i = 0; i<plan.size(); i++){
+            auto stop = DBusSystem->StopByID(plan[i].DStopID);
+            if(!stop){
+                continue;
+            }
+            if(stop->Description().empty()){
+                auto node = DStreetMap->NodeByID(stop->NodeID());
+                if(node && node->HasAttribute("name")){
+                    stop->Description(node->GetAttribute("name"));
+                }
+            }
+        }
+  
+
+        // config values
+        std::string busColor0 = std::any_cast<std::string>(cfg->GetOption(CSVGTripPlanWriter::BusColor0));
+        std::string busColor1 = std::any_cast<std::string>(cfg->GetOption(CSVGTripPlanWriter::BusColor1));
+        int busStroke = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::BusStroke));
+        double stopRadius = std::any_cast<double>(cfg->GetOption(CSVGTripPlanWriter::BusStopRadius));
+        std::string srcColor = std::any_cast<std::string>(cfg->GetOption(CSVGTripPlanWriter::SourceColor));
+        double srcRadius = std::any_cast<double>(cfg->GetOption(CSVGTripPlanWriter::SourceRadius));
+        std::string dstColor = std::any_cast<std::string>(cfg->GetOption(CSVGTripPlanWriter::DestinationColor));
+        double dstRadius = std::any_cast<double>(cfg->GetOption(CSVGTripPlanWriter::DestinationRadius));
+
+
+        // draw street map lines
+        
+        for(size_t i = 0; i<DStreetMap->WayCount(); i++){
+            auto way = DStreetMap->WayByIndex(i);
+             std::string type = way->GetAttribute("highway");
+                if(type.empty()){
+                    continue;
+                }
+            for(size_t j = 0; j+ 1<way->NodeCount(); j++){
+                auto n1 = DStreetMap->NodeByID(way->GetNodeID(j));
+                auto n2 = DStreetMap->NodeByID(way->GetNodeID(j+1));
+                if(!n1 || !n2){
+                    continue;
+                }
+                auto l1 = n1->Location();
+                auto l2 = n2->Location();
+
+                auto p1 = toPoint(l1.DLongitude, l1.DLatitude, minLon, maxLat, lonRange, latRange, margin, drawW, drawH);
+                auto p2 = toPoint(l2.DLongitude, l2.DLatitude, minLon, maxLat, lonRange, latRange, margin, drawW, drawH);
+            
+                int width = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::ResidentialStroke));
+                if(type=="motorway"){
+                     width = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::MotorwayStroke));
+                }
+                else if(type == "primary"){
+                     width = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::PrimaryStroke));
+                }
+                else if(type == "secondary"){
+                     width = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::SecondaryStroke));
+                }
+                else if(type == "tertiary"){
+                     width = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::TertiaryStroke));
+                }
+
+                TAttributes streetStyle;
+                streetStyle.push_back({"stroke", std::any_cast<std::string>(cfg->GetOption(CSVGTripPlanWriter::StreetColor))});
+                streetStyle.push_back({"stroke-width", std::to_string(width)});
+                streetStyle.push_back({"fill", "none"});
+
+                writer.Line(p1, p2, streetStyle);
+            }
+        }
+        // draw bus lines
         for(size_t i = 0; i + 1 < plan.size(); i++){
             auto fromStop = DBusSystem->StopByID(plan[i].DStopID);
             auto toStop = DBusSystem->StopByID(plan[i+1].DStopID);
             if(!fromStop || !toStop){
                 continue;
             }
-            auto fromNode = DStreetMap->NodeByID(fromStop->NodeID());
-            auto toNode = DStreetMap->NodeByID(toStop->NodeID());
-            if (!fromNode || !toNode){
-                continue;
+            std::string busColor = plan[i].DRouteName.empty() ? busColor1 : busColor0;
+            TAttributes busStyle;
+            busStyle.push_back({"stroke", busColor});
+            busStyle.push_back({"stroke-width", std::to_string(busStroke)});
+            busStyle.push_back({"fill","none"});
+            if(!plan[i].DRouteName.empty() && plan[i].DRouteName == plan[i+1].DRouteName){
+                auto path = DBusSystem->PathByStopIDs(plan[i].DStopID, plan[i+1].DStopID);
+                if(path && path->NodeCount() >= 2){
+                    for(size_t j = 0; j+1<path->NodeCount(); j++){
+                        auto n1 = DStreetMap->NodeByID(path->GetNodeID(j));
+                        auto n2 = DStreetMap->NodeByID(path->GetNodeID(j+1));
+                        if(!n1 || !n2){
+                            continue;
+                        }
+                        auto l1 = n1->Location();
+                        auto l2 = n2->Location();
+                        SSVGPoint p1 = toPoint(l1.DLongitude, l1.DLatitude, minLon, maxLat, lonRange, latRange, margin, drawW, drawH);
+                        SSVGPoint p2 = toPoint(l2.DLongitude, l2.DLatitude, minLon, maxLat, lonRange, latRange, margin, drawW, drawH);
+                        writer.Line(p1, p2, busStyle);
+                    }
+                }
+            }
+            else{
+                auto n1 = DStreetMap->NodeByID(fromStop->NodeID());
+                auto n2 = DStreetMap->NodeByID(toStop->NodeID());
+                if(!n1 || !n2){
+                    continue;
+                }
+                auto l1 = n1->Location();
+                auto l2 = n2->Location();
+                SSVGPoint p1 = toPoint(l1.DLongitude, l1.DLatitude, minLon, maxLat, lonRange, latRange, margin, drawW, drawH);
+                SSVGPoint p2 = toPoint(l2.DLongitude, l2.DLatitude, minLon, maxLat, lonRange, latRange, margin, drawW, drawH);
+                writer.Line(p1, p2, busStyle);
             }
             
-            // if (fromStop->Description().empty() && fromNode->HasAttribute("name")){
-            //     fromStop->Description(fromNode->GetAttribute("name"));
-            // }
-            // if(toStop->Description().empty() && toNode->HasAttribute("name")){
-            //     toStop->Description(toNode->GetAttribute("name"));
-            // }
-            auto fromLoc = fromNode->Location();
-            auto toLoc = toNode->Location();
-            SSVGPoint start{fromLoc.DLongitude, -fromLoc.DLatitude};
-            SSVGPoint end{toLoc.DLongitude, -toLoc.DLatitude};
-            writer.Line(start,end,style);
         }
-        std::string svgTail = "</svg\n";
+
+        // draw stop circles
+        for(size_t i = 0; i<plan.size(); i++){
+            auto stop = DBusSystem->StopByID(plan[i].DStopID);
+            if(!stop){
+                continue;
+            }
+           
+            auto node = nodePoint(stop->NodeID());
+            if(!node){
+                continue;
+            }
+            auto loc = node->Location();
+            auto pt = toPoint(loc.DLongitude, loc.DLatitude, minLon, maxLat, lonRange, latRange, margin, drawW, drawH);
+    
+                auto stop = DBusSystem->StopByID(plan[i].DStopID);
+                if(i==0){
+                    drawCircle(writer, pt, srcRadius, srcColor);
+                }
+                else if(i+1 == plan.size()){
+                    drawCircle(writer, pt, dstRadius, dstColor);
+                }
+                else{
+                    drawCircle(writer, pt, stopRadius, plan[i].DRouteName.empty() ? busColor1 : busColor0);
+                }
+        
+
+            
+            std::string labelColor = std::any_cast<std::string>(cfg->GetOption(CSVGTripPlanWriter::LabelColor));
+            int labelSize = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::LabelSize));
+            std::string text = "<text x='" + std::to_string(pt.DX) + "' y='" + std::to_string(pt.DY - 10) + "' fill='" + labelColor + "' font-size='" + std::to_string(labelSize) + "'>" + stop->Description() + "</text>\n";
+
+            std::vector<char> tbuf(text.begin(), text.end());
+            sink->Write(tbuf);
+        }
+        std::string svgTail = "</svg>\n";
         std::vector<char> buff(svgTail.begin(), svgTail.end());
         sink->Write(buff);
         return true;

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="7" failures="0" disabled="0" errors="0" time="0." timestamp="2026-03-12T21:25:58.141" name="AllTests">
-  <testsuite name="XMLReaderTest" tests="7" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-03-12T21:25:58.141">
-    <testcase name="SimpleTest" file="testsrc/XMLReaderTest.cpp" line="5" status="run" result="completed" time="0." timestamp="2026-03-12T21:25:58.141" classname="XMLReaderTest" />
-    <testcase name="ElementTest" file="testsrc/XMLReaderTest.cpp" line="23" status="run" result="completed" time="0." timestamp="2026-03-12T21:25:58.141" classname="XMLReaderTest" />
-    <testcase name="CDataTest" file="testsrc/XMLReaderTest.cpp" line="52" status="run" result="completed" time="0." timestamp="2026-03-12T21:25:58.141" classname="XMLReaderTest" />
-    <testcase name="LongCDataTest" file="testsrc/XMLReaderTest.cpp" line="70" status="run" result="completed" time="0." timestamp="2026-03-12T21:25:58.141" classname="XMLReaderTest" />
-    <testcase name="SpecialCharacterTest" file="testsrc/XMLReaderTest.cpp" line="99" status="run" result="completed" time="0." timestamp="2026-03-12T21:25:58.141" classname="XMLReaderTest" />
-    <testcase name="InvalidXMLTest" file="testsrc/XMLReaderTest.cpp" line="117" status="run" result="completed" time="0." timestamp="2026-03-12T21:25:58.141" classname="XMLReaderTest" />
-    <testcase name="LongCharDataCrosses512Boundary" file="testsrc/XMLReaderTest.cpp" line="129" status="run" result="completed" time="0." timestamp="2026-03-12T21:25:58.141" classname="XMLReaderTest" />
+<testsuites tests="7" failures="0" disabled="0" errors="0" time="0." timestamp="2026-03-13T01:40:02.905" name="AllTests">
+  <testsuite name="XMLReaderTest" tests="7" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-03-13T01:40:02.905">
+    <testcase name="SimpleTest" file="testsrc/XMLReaderTest.cpp" line="5" status="run" result="completed" time="0." timestamp="2026-03-13T01:40:02.905" classname="XMLReaderTest" />
+    <testcase name="ElementTest" file="testsrc/XMLReaderTest.cpp" line="23" status="run" result="completed" time="0." timestamp="2026-03-13T01:40:02.905" classname="XMLReaderTest" />
+    <testcase name="CDataTest" file="testsrc/XMLReaderTest.cpp" line="52" status="run" result="completed" time="0." timestamp="2026-03-13T01:40:02.905" classname="XMLReaderTest" />
+    <testcase name="LongCDataTest" file="testsrc/XMLReaderTest.cpp" line="70" status="run" result="completed" time="0." timestamp="2026-03-13T01:40:02.905" classname="XMLReaderTest" />
+    <testcase name="SpecialCharacterTest" file="testsrc/XMLReaderTest.cpp" line="99" status="run" result="completed" time="0." timestamp="2026-03-13T01:40:02.905" classname="XMLReaderTest" />
+    <testcase name="InvalidXMLTest" file="testsrc/XMLReaderTest.cpp" line="117" status="run" result="completed" time="0." timestamp="2026-03-13T01:40:02.905" classname="XMLReaderTest" />
+    <testcase name="LongCharDataCrosses512Boundary" file="testsrc/XMLReaderTest.cpp" line="129" status="run" result="completed" time="0." timestamp="2026-03-13T01:40:02.905" classname="XMLReaderTest" />
   </testsuite>
 </testsuites>

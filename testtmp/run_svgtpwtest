@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="4" failures="3" disabled="0" errors="0" time="0.02" timestamp="2026-03-12T22:44:00.445" name="AllTests">
-  <testsuite name="SVGTripPlanWriter" tests="4" failures="3" disabled="0" skipped="0" errors="0" time="0.02" timestamp="2026-03-12T22:44:00.445">
-    <testcase name="SimpleRoute" file="testsrc/SVGTripPlanWriterTest.cpp" line="51" status="run" result="completed" time="0.006" timestamp="2026-03-12T22:44:00.445" classname="SVGTripPlanWriter">
+<testsuites tests="4" failures="3" disabled="0" errors="0" time="0.013" timestamp="2026-03-13T01:40:12.828" name="AllTests">
+  <testsuite name="SVGTripPlanWriter" tests="4" failures="3" disabled="0" skipped="0" errors="0" time="0.013" timestamp="2026-03-13T01:40:12.828">
+    <testcase name="SimpleRoute" file="testsrc/SVGTripPlanWriterTest.cpp" line="51" status="run" result="completed" time="0.005" timestamp="2026-03-13T01:40:12.828" classname="SVGTripPlanWriter">
       <failure message="testsrc/SVGTripPlanWriterTest.cpp:98&#x0A;Expected equality of these values:&#x0A;  HorizontalLines&#x0A;    Which is: 1&#x0A;  92&#x0A;" type=""><![CDATA[testsrc/SVGTripPlanWriterTest.cpp:98
 Expected equality of these values:
   HorizontalLines
@@ -48,7 +48,7 @@ Value of: Labels.contains("9th & C St.")
 Expected: true
 ]]></failure>
     </testcase>
-    <testcase name="OneStopRoute" file="testsrc/SVGTripPlanWriterTest.cpp" line="108" status="run" result="completed" time="0.004" timestamp="2026-03-12T22:44:00.451" classname="SVGTripPlanWriter">
+    <testcase name="OneStopRoute" file="testsrc/SVGTripPlanWriterTest.cpp" line="108" status="run" result="completed" time="0.002" timestamp="2026-03-13T01:40:12.834" classname="SVGTripPlanWriter">
       <failure message="testsrc/SVGTripPlanWriterTest.cpp:159&#x0A;Expected equality of these values:&#x0A;  HorizontalLines&#x0A;    Which is: 2&#x0A;  118&#x0A;" type=""><![CDATA[testsrc/SVGTripPlanWriterTest.cpp:159
 Expected equality of these values:
   HorizontalLines
@@ -100,8 +100,8 @@ Value of: Labels.contains("9th & C St.")
 Expected: true
 ]]></failure>
     </testcase>
-    <testcase name="ConfigTest" file="testsrc/SVGTripPlanWriterTest.cpp" line="170" status="run" result="completed" time="0.004" timestamp="2026-03-12T22:44:00.456" classname="SVGTripPlanWriter" />
-    <testcase name="UpdatedDescription" file="testsrc/SVGTripPlanWriterTest.cpp" line="240" status="run" result="completed" time="0.005" timestamp="2026-03-12T22:44:00.460" classname="SVGTripPlanWriter">
+    <testcase name="ConfigTest" file="testsrc/SVGTripPlanWriterTest.cpp" line="170" status="run" result="completed" time="0.002" timestamp="2026-03-13T01:40:12.836" classname="SVGTripPlanWriter" />
+    <testcase name="UpdatedDescription" file="testsrc/SVGTripPlanWriterTest.cpp" line="240" status="run" result="completed" time="0.003" timestamp="2026-03-13T01:40:12.839" classname="SVGTripPlanWriter">
       <failure message="testsrc/SVGTripPlanWriterTest.cpp:242&#x0A;Expected equality of these values:&#x0A;  Stop-&gt;Description()&#x0A;    Which is: &quot;&quot;&#x0A;  &quot;1st &amp; M St.&quot;&#x0A;" type=""><![CDATA[testsrc/SVGTripPlanWriterTest.cpp:242
 Expected equality of these values:
   Stop->Description()
