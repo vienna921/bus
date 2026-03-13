@@ -145,10 +145,14 @@ struct CSVGTripPlanWriter::SImplementation{
             return false;
         }
         auto cfg = std::dynamic_pointer_cast<SimpleConfig>(DConfig);
+        //load SVG config
         int width = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::SVGWidth));
         int height = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::SVGHeight));
         int margin = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::SVGMarginPixels));
         
+        int drawW = width - 2*margin;
+        int drawH = height - 2*margin;
+
         // bounding box
         double minLon = 1e18, maxLon = -1e18;
         double minLat = 1e18, maxLat = -1e18;
