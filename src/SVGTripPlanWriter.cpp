@@ -1,5 +1,6 @@
 #include "SVGTripPlanWriter.h"
 #include "SVGWriter.h"
+#include "GeographicUtils.h"
 #include <unordered_map>
 
 struct SimpleConfig : public CTripPlanWriter::SConfig{
@@ -131,6 +132,8 @@ struct CSVGTripPlanWriter::SImplementation{
     // converts geo coordinates to SVG pixel point
         SSVGPoint toPoint(double lon, double lat, double minLon, double maxLat, double lonRange, double latRange, int margin, int drawW, int drawH){
             SSVGPoint pt;
+            double xMiles = SGeographicUtils::HaversineDistanceInMiles({maxLat, minLon}, {maxLat, lon});
+            double yMiles = SGeographicUtils::HaversineDistanceInMiles({maxLat, minLon}, {lat, minLon});
             pt.DX = margin + (lon-minLon) / lonRange * drawW;
             pt.DY = margin + (maxLat - lat) / latRange * drawH;
             return pt;
@@ -154,32 +157,29 @@ struct CSVGTripPlanWriter::SImplementation{
         int drawH = height - 2*margin;
 
         // bounding box
-        double minLon = 1e18, maxLon = -1e18;
-        double minLat = 1e18, maxLat = -1e18;
-        for(size_t i = 0; i<DStreetMap->NodeCount(); i++){
+        std::vector<CStreetMap::SLocation> allLocs;
+        for(size_t i=0; i<DStreetMap->NodeCount(); i++){
             auto node = DStreetMap->NodeByIndex(i);
-            if(!node){
-                continue;
-            }
-            auto loc = node->Location();
-            if(loc.DLongitude<minLon){
-                minLon = loc.DLongitude;
-            }
-            if(loc.DLongitude>maxLon){
-                maxLon = loc.DLongitude;
-            }
-            if(loc.DLatitude<minLat){
-                minLat = loc.DLatitude;
-            }
-            if(loc.DLatitude>maxLat){
-                maxLat = loc.DLatitude;
+            if(node){
+                allLocs.push_back(node->Location());
             }
         }
 
-        double lonRange = maxLon - minLon ? maxLon-minLon : 1;
-        double latRange = maxLat-minLat ? maxLat - minLat : 1;
-        int drawW = width - 2 * margin;
-        int drawH = height - 2 * margin;
+        CStreetMap::SLocation lowerLeft, upperRight;
+        SGeographicUtils::CalculateExtents(allLocs, lowerLeft, upperRight);
+
+        double lonRange = SGeographicUtils::HaversineDistanceInMiles({lowerLeft.DLatitude, lowerLeft.DLongitude}, {lowerLeft.DLatitude, upperRight.DLongitude});
+        double latRange = SGeographicUtils::HaversineDistanceInMiles({lowerLeft.DLatitude, lowerLeft.DLongitude},{upperRight.DLatitude, lowerLeft.DLongitude});
+
+        if(latRange ==0){
+            latRange = 1;
+        }
+        if(lonRange == 0){
+            lonRange = 1;
+        }
+
+        double minLon = lowerLeft.DLongitude;
+        double maxLat = upperRight.DLatitude;
     
         //write opening <svg> tag'
         std::string svgHeader = "<svg width='" + std::to_string(width) + "' height='" + std::to_string(height) + "' xmlns='http://www.w3.org/2000/svg'>\n";
@@ -232,18 +232,18 @@ struct CSVGTripPlanWriter::SImplementation{
                 auto p1 = toPoint(l1.DLongitude, l1.DLatitude, minLon, maxLat, lonRange, latRange, margin, drawW, drawH);
                 auto p2 = toPoint(l2.DLongitude, l2.DLatitude, minLon, maxLat, lonRange, latRange, margin, drawW, drawH);
             
-                int width = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::ResidentialStroke));
+                int strokeWidth = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::ResidentialStroke));
                 if(type=="motorway"){
-                     width = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::MotorwayStroke));
+                     strokeWidth = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::MotorwayStroke));
                 }
                 else if(type == "primary"){
-                     width = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::PrimaryStroke));
+                     strokeWidth = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::PrimaryStroke));
                 }
                 else if(type == "secondary"){
-                     width = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::SecondaryStroke));
+                     strokeWidth = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::SecondaryStroke));
                 }
                 else if(type == "tertiary"){
-                     width = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::TertiaryStroke));
+                     strokeWidth = std::any_cast<int>(cfg->GetOption(CSVGTripPlanWriter::TertiaryStroke));
                 }
 
                 TAttributes streetStyle;
@@ -312,7 +312,6 @@ struct CSVGTripPlanWriter::SImplementation{
             auto loc = node->Location();
             auto pt = toPoint(loc.DLongitude, loc.DLatitude, minLon, maxLat, lonRange, latRange, margin, drawW, drawH);
     
-                auto stop = DBusSystem->StopByID(plan[i].DStopID);
                 if(i==0){
                     drawCircle(writer, pt, srcRadius, srcColor);
                 }

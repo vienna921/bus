@@ -140,7 +140,8 @@ TEST_SVGTPW_OBJ_FILES = \
     $(TEST_STRSRC_OBJ) \
     $(TEST_XML_OBJ) \
     $(TEST_MOCK_BS_OBJ) \
-    $(TEST_MOCK_SM_OBJ)
+    $(TEST_MOCK_SM_OBJ) \
+	$(TEST_GEO_OBJ)
 
 # Define the targets
 SVGLIB_TARGET			= $(LIB_DIR)/libsvg.a

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="3" failures="0" disabled="0" errors="0" time="0.001" timestamp="2026-03-13T01:40:10.310" name="AllTests">
-  <testsuite name="BusSystemIndexer" tests="3" failures="0" disabled="0" skipped="0" errors="0" time="0.001" timestamp="2026-03-13T01:40:10.310">
-    <testcase name="SimpleTest" file="testsrc/BusSystemIndexerTest.cpp" line="20" status="run" result="completed" time="0." timestamp="2026-03-13T01:40:10.310" classname="BusSystemIndexer" />
-    <testcase name="RouteByStop" file="testsrc/BusSystemIndexerTest.cpp" line="74" status="run" result="completed" time="0." timestamp="2026-03-13T01:40:10.311" classname="BusSystemIndexer" />
-    <testcase name="StopsByRoutes" file="testsrc/BusSystemIndexerTest.cpp" line="88" status="run" result="completed" time="0." timestamp="2026-03-13T01:40:10.311" classname="BusSystemIndexer" />
+<testsuites tests="3" failures="0" disabled="0" errors="0" time="0.001" timestamp="2026-03-13T03:47:44.593" name="AllTests">
+  <testsuite name="BusSystemIndexer" tests="3" failures="0" disabled="0" skipped="0" errors="0" time="0.001" timestamp="2026-03-13T03:47:44.593">
+    <testcase name="SimpleTest" file="testsrc/BusSystemIndexerTest.cpp" line="20" status="run" result="completed" time="0." timestamp="2026-03-13T03:47:44.593" classname="BusSystemIndexer" />
+    <testcase name="RouteByStop" file="testsrc/BusSystemIndexerTest.cpp" line="74" status="run" result="completed" time="0." timestamp="2026-03-13T03:47:44.594" classname="BusSystemIndexer" />
+    <testcase name="StopsByRoutes" file="testsrc/BusSystemIndexerTest.cpp" line="88" status="run" result="completed" time="0." timestamp="2026-03-13T03:47:44.594" classname="BusSystemIndexer" />
   </testsuite>
 </testsuites>
