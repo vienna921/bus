@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="3" failures="0" disabled="0" errors="0" time="0.001" timestamp="2026-03-13T03:47:55.867" name="AllTests">
-  <testsuite name="TripPlanner" tests="3" failures="0" disabled="0" skipped="0" errors="0" time="0.001" timestamp="2026-03-13T03:47:55.867">
-    <testcase name="DirectRouteTest" file="testsrc/TripPlannerTest.cpp" line="28" status="run" result="completed" time="0." timestamp="2026-03-13T03:47:55.867" classname="TripPlanner" />
-    <testcase name="FindRouteTest" file="testsrc/TripPlannerTest.cpp" line="37" status="run" result="completed" time="0." timestamp="2026-03-13T03:47:55.868" classname="TripPlanner" />
-    <testcase name="FindOneStopRouteTest" file="testsrc/TripPlannerTest.cpp" line="59" status="run" result="completed" time="0." timestamp="2026-03-13T03:47:55.868" classname="TripPlanner" />
-  </testsuite>
-</testsuites>
