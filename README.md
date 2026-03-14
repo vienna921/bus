@@ -587,6 +587,107 @@ Because they don’t modify anything.
 ### Changes 5
 Understanding how to use functions with const
 
+### Prompt 6
+What does verbose output mean
+### Response 6
+“Verbose output” basically means the program gives more detailed information about what it’s doing while it runs, rather than just the basic results or errors.
+
+Think of it like this:
+
+Normal output: “Task completed.”
+
+Verbose output:
+
+Starting task...
+Reading file 'data.txt'...
+File read successfully.
+Processing data...
+Task completed successfully in 0.32 seconds.
+
+In programming and debugging, verbose output is useful because it helps you see the internal steps, catch errors, or understand why something isn’t working. Often, you can enable it with a flag like --verbose or a boolean option in code.
+### Changes
+Understanding on the extra credit assignment
+
+### Prompt 7
+Can you explain how flags works with verbose
+### Response 7
+1️⃣ What a “flag” is
+
+A flag is usually a boolean option (true/false) that you can turn on or off to control the behavior of a program.
+
+Example in the command line:
+
+myprogram --verbose
+
+Here, --verbose is a flag. If you include it, the program will show extra messages. If you omit it, the program stays quiet.
+
+Example in code:
+
+bool verboseEnabled = false;  // flag starts off
+if(verboseEnabled){
+    std::cout << "Processing step 1..." << std::endl;
+}
+### Changes 7
+Implemented verbose flag in TextTripPlanWriter
+
+### Prompt 8
+What is a simple configuration test
+### Response 8
+A simple configuration test generally refers to a small, focused test that checks whether a system, program, or component works correctly with a basic or minimal configuration. It’s not about testing all possible settings—just making sure the default or minimal setup behaves as expected.
+
+Here’s a breakdown:
+
+1. Purpose
+
+Verify that the system can start and run with default or simple settings.
+
+Catch basic misconfigurations early.
+
+Ensure that minimal features or flags are working.
+### Changes 8
+Implemented a SimpleConfiguration test in TextTripPlanWriter
+
+### Prompt 9
+how do vectors work
+### Response 9
+2. In Programming (C++, Java, etc.)
+
+In programming, a vector is usually a dynamic array—a container that can grow or shrink in size. Think of it like a flexible list.
+
+C++ Example
+#include <vector>
+#include <iostream>
+using namespace std;
+
+int main() {
+    vector<int> numbers; // empty vector
+
+    numbers.push_back(10); // add 10
+    numbers.push_back(20); // add 20
+    numbers.push_back(30); // add 30
+
+    cout << "Vector size: " << numbers.size() << endl; // 3
+    cout << "First element: " << numbers[0] << endl;   // 10
+
+    numbers.pop_back(); // removes 30
+    cout << "New size: " << numbers.size() << endl;   // 2
+}
+Key Points
+
+push_back() → add element to the end.
+
+pop_back() → remove last element.
+
+Indexing like an array (numbers[0]).
+
+Automatically resizes when you add more elements than it currently holds.
+
+Faster than manually managing arrays in many cases.
+### Changes 9
+Just clarification
+
+
+
 ## Generative AI Use
 Student 2 used ChatGPT for Prompt 1
 

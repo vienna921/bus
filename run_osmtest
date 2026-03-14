@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="6" failures="0" disabled="0" errors="0" time="0." timestamp="2026-03-14T04:06:29.180" name="AllTests">
+  <testsuite name="OpenStreetMapTest" tests="6" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-03-14T04:06:29.180">
+    <testcase name="SimpleTest" file="testsrc/OpenStreetMapTest.cpp" line="34" status="run" result="completed" time="0." timestamp="2026-03-14T04:06:29.180" classname="OpenStreetMapTest" />
+    <testcase name="NodeAttributesTest" file="testsrc/OpenStreetMapTest.cpp" line="62" status="run" result="completed" time="0." timestamp="2026-03-14T04:06:29.180" classname="OpenStreetMapTest" />
+    <testcase name="NodeCountTest" file="testsrc/OpenStreetMapTest.cpp" line="88" status="run" result="completed" time="0." timestamp="2026-03-14T04:06:29.180" classname="OpenStreetMapTest" />
+    <testcase name="WayParsingTest" file="testsrc/OpenStreetMapTest.cpp" line="104" status="run" result="completed" time="0." timestamp="2026-03-14T04:06:29.180" classname="OpenStreetMapTest" />
+    <testcase name="WayAttributesTest" file="testsrc/OpenStreetMapTest.cpp" line="130" status="run" result="completed" time="0." timestamp="2026-03-14T04:06:29.180" classname="OpenStreetMapTest" />
+    <testcase name="EmptyMapTest" file="testsrc/OpenStreetMapTest.cpp" line="156" status="run" result="completed" time="0." timestamp="2026-03-14T04:06:29.181" classname="OpenStreetMapTest" />
+  </testsuite>
+</testsuites>
