@@ -7,6 +7,11 @@
 #include "TripPlannerCommandLine.h"
 #include "StringDataSink.h"
 #include "StringDataSource.h"
+#include "BusSystem.h"
+#include <memory>
+#include <vector>
+#include <unordered_map>
+#include <string>
 
 #include <iostream>
 using std::cout;
@@ -16,6 +21,95 @@ class CMockFactory : public CDataFactory{
     public:
         MOCK_METHOD(std::shared_ptr< CDataSource >, CreateSource, (const std::string &name), (noexcept, override));
         MOCK_METHOD(std::shared_ptr< CDataSink >, CreateSink, (const std::string &name), (noexcept, override));
+};
+
+
+// --- Minimal TestStop ---
+class TestStop : public CBusSystem::SStop {
+    CBusSystem::TStopID DId;
+    CStreetMap::TNodeID DNodeID;
+    std::string DDescription;
+
+public:
+    TestStop(CBusSystem::TStopID id, CStreetMap::TNodeID node, const std::string &desc)
+        : DId(id), DNodeID(node), DDescription(desc) {}
+
+    CBusSystem::TStopID ID() const noexcept override { return DId; }
+    CStreetMap::TNodeID NodeID() const noexcept override { return DNodeID; }
+    std::string Description() const noexcept override { return DDescription; }
+    std::string Description(const std::string &desc) noexcept override { return DDescription = desc; }
+};
+
+// --- Minimal TestRoute ---
+class TestRoute : public CBusSystem::SRoute {
+    std::string DName;
+    std::vector<CBusSystem::TStopID> DStops;
+
+public:
+    TestRoute(const std::string &name) : DName(name) {}
+    void AddStop(CBusSystem::TStopID stop) { DStops.push_back(stop); }
+
+    std::string Name() const noexcept override { return DName; }
+    std::size_t StopCount() const noexcept override { return DStops.size(); }
+    std::size_t TripCount() const noexcept override { return 1; } // simplified for tests
+    CBusSystem::TStopID GetStopID(std::size_t index) const noexcept override { return DStops[index]; }
+    CBusSystem::TStopTime GetStopTime(std::size_t, std::size_t) const noexcept override {
+        return CBusSystem::TStopTime{std::chrono::seconds{0}};
+    }
+};
+
+// --- Minimal TestBusSystem ---
+class TestBusSystem : public CBusSystem {
+    std::vector<std::shared_ptr<CBusSystem::SStop>> Stops;
+    std::unordered_map<CBusSystem::TStopID, std::shared_ptr<CBusSystem::SStop>> StopMap;
+    std::vector<std::shared_ptr<TestRoute>> Routes;
+    std::unordered_map<std::string, std::shared_ptr<TestRoute>> RouteMap;
+
+public:
+    TestBusSystem() {
+        // --- Add stops ---
+        auto stop28 = std::make_shared<TestStop>(28, 752, "3rd & K St.");
+        auto stop82 = std::make_shared<TestStop>(82, 900, "9th & C St.");
+        Stops = {stop28, stop82};
+        StopMap[28] = stop28;
+        StopMap[82] = stop82;
+
+        // --- Add routes ---
+        auto routeF = std::make_shared<TestRoute>("F");
+        routeF->AddStop(28);
+        routeF->AddStop(82);
+        auto routeG = std::make_shared<TestRoute>("G");
+        routeG->AddStop(28);
+        routeG->AddStop(82);
+
+        Routes = {routeF, routeG};
+        RouteMap["F"] = routeF;
+        RouteMap["G"] = routeG;
+    }
+
+    std::size_t StopCount() const noexcept override { return Stops.size(); }
+    std::size_t RouteCount() const noexcept override { return Routes.size(); }
+    std::shared_ptr<SStop> StopByIndex(std::size_t index) const noexcept override { return Stops.at(index); }
+    std::shared_ptr<SStop> StopByID(TStopID id) const noexcept override { return StopMap.at(id); }
+    std::shared_ptr<SRoute> RouteByIndex(std::size_t index) const noexcept override { return Routes.at(index); }
+    std::shared_ptr<SRoute> RouteByName(const std::string &name) const noexcept override { return RouteMap.at(name); }
+
+    // Return a trivial path for testing
+    std::shared_ptr<SPath> PathByStopIDs(TStopID start, TStopID end) const noexcept override {
+        struct TestPath : public SPath {
+            CStreetMap::TNodeID Start, End;
+            TestPath(CStreetMap::TNodeID s, CStreetMap::TNodeID e) : Start(s), End(e) {}
+            CStreetMap::TNodeID StartNodeID() const noexcept override { return Start; }
+            CStreetMap::TNodeID EndNodeID() const noexcept override { return End; }
+            std::size_t NodeCount() const noexcept override { return 2; }
+            CStreetMap::TNodeID GetNodeID(std::size_t index) const noexcept override {
+                return index == 0 ? Start : End;
+            }
+        };
+        auto s = StopByID(start)->NodeID();
+        auto e = StopByID(end)->NodeID();
+        return std::make_shared<TestPath>(s, e);
+    }
 };
 
 class TripPlannerCommandLine : public ::testing::Test{

@@ -21,6 +21,7 @@ class CTripPlannerCommandLine{
             std::shared_ptr<CStreetMap> DStreetMap;
             std::shared_ptr<CTripPlanWriter> DOutWriter;
             std::shared_ptr<CTripPlanWriter> DStorageWriter;
+            std::shared_ptr<CBusSystem> DBusSystem;
         };
 
         CTripPlannerCommandLine(std::shared_ptr<SConfig> config);
